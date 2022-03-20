@@ -1,27 +1,9 @@
+local fuilLib = require("script.lib.fuelingTools");
 
 print("something");
-
-local MAX_TURTLE_SLOT = 16
 local SpiralSegmentLength = 8;
 local TorchSlot = 1;
 local CobbleSlot = 2;
-
---[[ function which attempts to refuel from current slot, searching for fuel --]]
-function EnsureFueled()
-    if(turtle.getFuelLevel() > 10) then
-        return;
-    end
-    local currentSlot = 1;
-    turtle.select(currentSlot);
-    while(currentSlot < MAX_TURTLE_SLOT and not turtle.refuel(1)) do
-        currentSlot = currentSlot + 1
-        turtle.select(currentSlot);
-    end
-    
-    if turtle.getFuelLevel() < 10 then
-       error("Ran out of fuel", 5);
-    end
-end
 
 function GoForwardSingle()
     while turtle.dig() do
@@ -33,7 +15,7 @@ function GoForwardSingle()
 end
 
 function GoForward(dist)
-    EnsureFueled();
+    fuilLib.EnsureFueled();
     for i = 1, dist, 1 do
         GoForwardSingle()
     end

@@ -1,10 +1,6 @@
 
-print("something");
-
-local MAX_TURTLE_SLOT = 16
-
 --[[ function which attempts to refuel from current slot, searching for fuel --]]
-function EnsureFueled()
+local function EnsureFueled()
     if(turtle.getFuelLevel() > 10) then
         return;
     end
@@ -20,17 +16,4 @@ function EnsureFueled()
     end
 end
 
-
-function GoForward()
-    EnsureFueled();
-    while turtle.dig() do
-        
-    end
-    turtle.forward();
-    turtle.digUp();
-    turtle.digDown();
-end
-
-while true do
-    GoForward();
-end
+return {EnsureFueled=EnsureFueled}
