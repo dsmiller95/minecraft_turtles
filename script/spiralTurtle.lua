@@ -2,9 +2,9 @@
 print("something");
 
 local MAX_TURTLE_SLOT = 16
-local SpiralLevel = 0;
-local SpiralSegmentLength = 5;
+local SpiralSegmentLength = 8;
 local TorchSlot = 1;
+local CobbleSlot = 2;
 
 --[[ function which attempts to refuel from current slot, searching for fuel --]]
 function EnsureFueled()
@@ -39,64 +39,76 @@ function GoForward(dist)
     end
 end
 
-function StepOnce()
-    GoForward(SpiralSegmentLength);
-    turtle.select(TorchSlot);
-    if turtle.getItemCount() <= 1 then
-        error("ran out of torches")
+function PlaceBlockFromSlotSafeDown(slotNumber)
+    if turtle.getItemCount(slotNumber) <= 1 then
+        error("ran out of items in slot " .. slotNumber)
     end
-    turtle.placeDown();
-    turtle.turnLeft();
+    turtle.select(slotNumber);
+    return turtle.placeDown();
+end
+
+function PlaceTorch()
+    turtle.digUp()
+    turtle.digDown();
+    turtle.down();
+    turtle.digDown();
+    PlaceBlockFromSlotSafeDown(CobbleSlot);
+    turtle.up();
+    PlaceBlockFromSlotSafeDown(TorchSlot);
+end
+
+function InspectAdjacentNode()
     GoForward(SpiralSegmentLength - 1);
-    while turtle.dig    () do end
-    turtle  .forward();
+    while turtle.dig() do end
+    turtle.forward();
     turtle.select(TorchSlot);
-    if turtle.compareDown() then
-        -- we've visited this node before. turn around and go back
-        turtle  .turnLeft();turtle  .turnLeft();
-        GoForward(SpiralSegmentLength   -1)
-        turtle.forward();
-        turtle.turnLeft();
-    end
+    return turtle.compareDown();
 end
 
-
-
-function BackMany(dist)
-    EnsureFueled();
-    for i = 1, dist, 1 do
-        if not turtle.back()then
-            error("path blocked");
-        end
-    end
+function ReturnFromAdjacentNode()
+    -- we've visited this node before. turn around and go back, restoring original orientation
+    turtle.turnLeft(); turtle.turnLeft();
+    GoForward(SpiralSegmentLength - 1);
+    turtle.forward();
+    turtle.turnLeft();turtle.turnLeft();
 end
 
-function GoForwardWithBackLink(dist)
+function StepOnce()
+    -- turn left and check the left node
     turtle.turnLeft();
-    GoForward(dist - 1);
-    BackMany(dist - 1);
+    if not InspectAdjacentNode() then
+        -- mark as visited, and return to repeat
+        PlaceTorch();
+        return;
+    end
+    ReturnFromAdjacentNode();
+    
+    -- turn right back to center and check the center node
     turtle.turnRight();
-    GoForward(dist);
+    if not InspectAdjacentNode() then
+        -- mark as visited, and return to repeat
+        PlaceTorch();
+        return;
+    end
+    ReturnFromAdjacentNode();
+    
+    -- turn right and check the right node
+    turtle.turnRight();
+    if not InspectAdjacentNode() then
+        -- mark as visited, and return to repeat
+        PlaceTorch();
+        return;
+    end
+    -- all adjacent nodes visited. trapped.
+    error("trapped in a prison of my own design", 100)
 end
 
-function DoSquareSide(sideLength)
-    turtle.turnLeft();
-    GoForward(SpiralSegmentLength);
-    for j = 1, sideLength - 1, 1 do
-        GoForwardWithBackLink(SpiralSegmentLength);
-    end
-end
-
-function NavigateSquare(sideLength)
-    DoSquareSide(sideLength - 1);
-    for i = 1, 3, 1 do
-        DoSquareSide(sideLength);
-    end
+EnsureFueled();
+turtle.select(TorchSlot);
+while not turtle.compareDown() do
+    turtle.back();
 end
 
 while true do
-    SpiralLevel = SpiralLevel + 2;
-    print("spiral level: " .. SpiralLevel);
-    GoForward(SpiralSegmentLength);
-    NavigateSquare(SpiralLevel);
+    StepOnce();
 end
