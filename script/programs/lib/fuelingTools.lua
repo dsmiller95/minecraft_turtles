@@ -1,4 +1,6 @@
 
+local MAX_TURTLE_SLOT = 16;
+
 --[[ function which attempts to refuel from current slot, searching for fuel --]]
 local function EnsureFueled()
     if(turtle.getFuelLevel() > 10) then
