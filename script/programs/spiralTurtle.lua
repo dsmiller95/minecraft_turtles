@@ -85,7 +85,7 @@ function StepOnce()
     error("trapped in a prison of my own design", 100)
 end
 
-EnsureFueled();
+fuilLib.EnsureFueled();
 turtle.select(TorchSlot);
 while not turtle.compareDown() do
     turtle.back();
