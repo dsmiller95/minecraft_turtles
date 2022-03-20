@@ -1,4 +1,4 @@
-local fuilLib = require("script.lib.fuelingTools");
+local fuilLib = require("lib.fuelingTools");
 
 
 print("something");
