@@ -19,7 +19,7 @@ function GoForwardSingle()
 end
 
 function GoForward(dist)
-    fuelingTools.EnsureFueled();
+    fuelingTools.EnsureFueled(FuelSlot);
     for i = 1, dist, 1 do
         GoForwardSingle()
     end
@@ -107,7 +107,7 @@ function StepOnce()
     error("trapped in a prison of my own design", 100)
 end
 
-fuelingTools.EnsureFueled();
+fuelingTools.EnsureFueled(FuelSlot);
 turtle.select(TorchSlot);
 while not turtle.compareDown() do
     turtle.back();
