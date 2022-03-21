@@ -32,6 +32,11 @@ function PlaceTorch()
     buildingTools.PlaceBlockFromSlotSafeDown(CobbleSlot);
     turtle.up();
     buildingTools.PlaceBlockFromSlotSafeDown(TorchSlot);
+    os.sleep(0.5);
+    turtle.select(TorchSlot);
+    if not turtle.compareDown() then
+        error("could not place torch")
+    end
 end
 
 function InspectAdjacentNode()
@@ -53,6 +58,7 @@ end
 function LeaveChestCrumb()
     turtle.digUp();
     turtle.up();
+    turtle.digUp();
     buildingTools.PlaceBlockFromSlotSafeUp(ChestSlot);
     for i = 1, 16 do
         if i ~= TorchSlot and i ~= CobbleSlot and i ~= ChestSlot then
