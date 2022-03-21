@@ -1,5 +1,5 @@
 
 return {
-    allPrograms = {"spiralTurtle", "straightTurtle"},
+    allPrograms = {"spiralTurtle", "straightTurtle", "mineToFloor"},
     allLibs = {"fuelingTools"}
 };
