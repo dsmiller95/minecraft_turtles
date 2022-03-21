@@ -13,7 +13,7 @@ local listingRequest = http.get("https://raw.githubusercontent.com/dsmiller95/mi
 local listingVal = listingRequest.readAll();
 listingRequest.close();
 local listings = loadstring(listingVal)()
-print("loaded library files, version: " .. listings.version);
+print("loading library files...");
 
 shell.run("rm", "programs")
 
@@ -23,3 +23,5 @@ end
 for _, library in ipairs(listings.allLibs) do
     WriteGithubCode("/script/programs/lib/" .. library, "/programs/lib/" .. library)
 end
+
+print("finished loading. library version: " .. listings.version);

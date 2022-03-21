@@ -70,8 +70,9 @@ function LeaveChestCrumb()
 end
 
 function StepOnce()
-    if(inventoryTools.InventoryFull()) then
-        LeaveChestCrumb()
+    if inventoryTools.InventoryFull() then
+        print("placing chest crumb");
+        LeaveChestCrumb();
     end
     -- turn left and check the left node
     turtle.turnLeft();
