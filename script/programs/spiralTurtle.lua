@@ -82,6 +82,7 @@ function StepOnce()
         print("placing chest crumb");
         LeaveChestCrumb();
     end
+    turtle.select(FuelSlot);
     -- turn left and check the left node
     turtle.turnLeft();
     if not InspectAdjacentNode() then
