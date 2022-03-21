@@ -4,6 +4,10 @@ local inventoryTools = require("lib.inventoryTools");
 
 print("something");
 local SpiralSegmentLength = 8;
+if table.maxn(arg) > 0 then
+    SpiralSegmentLength = arg[1]
+    print("grid segment size overriden to  " .. SpiralSegmentLength)
+end
 local TorchSlot = 1;
 local CobbleSlot = 2;
 local ChestSlot = 3;
