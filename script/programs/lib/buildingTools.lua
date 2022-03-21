@@ -13,7 +13,9 @@ function PlaceBlockFromSlotSafeDown(slotNumber)
                 break;
             end
         end
-        error("ran out of items in slot " .. slotNumber)
+        if turtle.getItemCount(slotNumber) <= 1 then
+            error("ran out of items in slot " .. slotNumber)
+        end
     end
     return turtle.placeDown();
 end
