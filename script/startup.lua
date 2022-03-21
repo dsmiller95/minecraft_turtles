@@ -15,6 +15,8 @@ listingRequest.close();
 print(listingVal)
 local listings = loadstring(listingVal)()
 
+shell.run("rm", "programs")
+
 for _, program in ipairs(listings.allPrograms) do
     WriteGithubCode("/script/programs/" .. program, "/programs/" .. program)
 end

@@ -1,4 +1,5 @@
 local fuilLib = require("lib.fuelingTools");
+local buildLib = require("lib.buildingTools");
 
 print("something");
 local SpiralSegmentLength = 8;
@@ -21,22 +22,14 @@ function GoForward(dist)
     end
 end
 
-function PlaceBlockFromSlotSafeDown(slotNumber)
-    if turtle.getItemCount(slotNumber) <= 1 then
-        error("ran out of items in slot " .. slotNumber)
-    end
-    turtle.select(slotNumber);
-    return turtle.placeDown();
-end
-
 function PlaceTorch()
     turtle.digUp()
     turtle.digDown();
     turtle.down();
     turtle.digDown();
-    PlaceBlockFromSlotSafeDown(CobbleSlot);
+    buildLib.PlaceBlockFromSlotSafeDown(CobbleSlot);
     turtle.up();
-    PlaceBlockFromSlotSafeDown(TorchSlot);
+    buildLib.PlaceBlockFromSlotSafeDown(TorchSlot);
 end
 
 function InspectAdjacentNode()
