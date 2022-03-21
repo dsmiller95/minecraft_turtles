@@ -6,11 +6,12 @@ local function EnsureFueled()
     if(turtle.getFuelLevel() > 10) then
         return;
     end
-    local currentSlot = 1;
-    turtle.select(currentSlot);
-    while(currentSlot < MAX_TURTLE_SLOT and not turtle.refuel(1)) do
-        currentSlot = currentSlot + 1
-        turtle.select(currentSlot);
+
+    for i = MAX_TURTLE_SLOT, 1, -1 do
+        turtle.select(i);
+        if turtle.refuel(1) then
+            break;
+        end
     end
     
     if turtle.getFuelLevel() < 10 then
