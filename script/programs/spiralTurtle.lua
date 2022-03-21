@@ -7,6 +7,7 @@ local SpiralSegmentLength = 8;
 local TorchSlot = 1;
 local CobbleSlot = 2;
 local ChestSlot = 3;
+local FuelSlot = 4;
 
 function GoForwardSingle()
     while turtle.dig() do
@@ -61,7 +62,7 @@ function LeaveChestCrumb()
     turtle.digUp();
     buildingTools.PlaceBlockFromSlotSafeUp(ChestSlot);
     for i = 1, 16 do
-        if i ~= TorchSlot and i ~= CobbleSlot and i ~= ChestSlot then
+        if i ~= TorchSlot and i ~= CobbleSlot and i ~= ChestSlot and i ~= FuelSlot then
             turtle.select(i);
             turtle.dropUp();
         end
