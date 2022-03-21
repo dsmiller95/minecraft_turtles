@@ -37,7 +37,8 @@ print("something");
 function PrintRow(rowString)
     for i = 1, string.len(rowString) do
         fuilLib.EnsureFueled();
-        local printSymbol = print(string.sub(rowString, i, i))
+        local printSymbol = string.sub(rowString, i, i)
+        print(printSymbol);
         if printSymbol == "1" then
             buildLib.PlaceBlockFromSlotSafeDown(PRINT_BLOCK_INDEX);
         end
