@@ -60,6 +60,9 @@ function LeaveChestCrumb()
     turtle.digUp();
     turtle.up();
     turtle.digUp();
+    turtle.up();
+    turtle.digUp();
+    turtle.down();
     buildingTools.PlaceBlockFromSlotSafeUp(ChestSlot);
     for i = 1, 16 do
         if i ~= TorchSlot and i ~= CobbleSlot and i ~= ChestSlot and i ~= FuelSlot then
