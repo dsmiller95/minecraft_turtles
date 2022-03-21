@@ -12,7 +12,7 @@ end
 local listingRequest = http.get("https://raw.githubusercontent.com/dsmiller95/minecraft_turtles/main/script/programListing.lua");
 local listingVal = listingRequest.readAll();
 listingRequest.close();
-print(listingVal)
+print("loaded library files, version: " .. listingVal.version);
 local listings = loadstring(listingVal)()
 
 shell.run("rm", "programs")
