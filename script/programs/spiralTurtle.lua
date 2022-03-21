@@ -1,10 +1,12 @@
-local fuilLib = require("lib.fuelingTools");
-local buildLib = require("lib.buildingTools");
+local fuelingTools = require("lib.fuelingTools");
+local buildingTools = require("lib.buildingTools");
+local inventoryTools = require("lib.inventoryTools");
 
 print("something");
 local SpiralSegmentLength = 8;
 local TorchSlot = 1;
 local CobbleSlot = 2;
+local ChestSlot = 3;
 
 function GoForwardSingle()
     while turtle.dig() do
@@ -16,7 +18,7 @@ function GoForwardSingle()
 end
 
 function GoForward(dist)
-    fuilLib.EnsureFueled();
+    fuelingTools.EnsureFueled();
     for i = 1, dist, 1 do
         GoForwardSingle()
     end
@@ -27,9 +29,9 @@ function PlaceTorch()
     turtle.digDown();
     turtle.down();
     turtle.digDown();
-    buildLib.PlaceBlockFromSlotSafeDown(CobbleSlot);
+    buildingTools.PlaceBlockFromSlotSafeDown(CobbleSlot);
     turtle.up();
-    buildLib.PlaceBlockFromSlotSafeDown(TorchSlot);
+    buildingTools.PlaceBlockFromSlotSafeDown(TorchSlot);
 end
 
 function InspectAdjacentNode()
@@ -48,7 +50,23 @@ function ReturnFromAdjacentNode()
     turtle.turnLeft();turtle.turnLeft();
 end
 
+function LeaveChestCrumb()
+    turtle.digUp();
+    turtle.up();
+    buildingTools.PlaceBlockFromSlotSafeUp(ChestSlot);
+    for i = 1, 16 do
+        if i ~= TorchSlot and i ~= CobbleSlot and i ~= ChestSlot then
+            turtle.select(i);
+            turtle.dropUp();
+        end
+    end
+    turtle.down();
+end
+
 function StepOnce()
+    if(inventoryTools.InventoryFull()) then
+        LeaveChestCrumb()
+    end
     -- turn left and check the left node
     turtle.turnLeft();
     if not InspectAdjacentNode() then
@@ -78,7 +96,7 @@ function StepOnce()
     error("trapped in a prison of my own design", 100)
 end
 
-fuilLib.EnsureFueled();
+fuelingTools.EnsureFueled();
 turtle.select(TorchSlot);
 while not turtle.compareDown() do
     turtle.back();

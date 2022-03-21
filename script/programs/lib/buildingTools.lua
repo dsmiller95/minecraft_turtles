@@ -2,7 +2,7 @@
 local MAX_TURTLE_SLOT = 16;
 
 
-function PlaceBlockFromSlotSafeDown(slotNumber)
+local function SelectSlotWithItemsSafe(slotNumber)
     turtle.select(slotNumber);
     if turtle.getItemCount(slotNumber) <= 1 then
         for i = 1, 16 do
@@ -17,7 +17,16 @@ function PlaceBlockFromSlotSafeDown(slotNumber)
             error("ran out of items in slot " .. slotNumber)
         end
     end
+end
+
+local function PlaceBlockFromSlotSafeDown(slotNumber)
+    SelectSlotWithItemsSafe(slotNumber);
     return turtle.placeDown();
 end
 
-return {PlaceBlockFromSlotSafeDown=PlaceBlockFromSlotSafeDown}
+local function PlaceBlockFromSlotSafeUp(slotNumber)
+    SelectSlotWithItemsSafe(slotNumber);
+    return turtle.placeUp();
+end
+
+return {PlaceBlockFromSlotSafeDown=PlaceBlockFromSlotSafeDown, PlaceBlockFromSlotSafeUp= PlaceBlockFromSlotSafeUp}
