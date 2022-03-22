@@ -5,8 +5,8 @@ ComputerConnection = {lastAnnounce = 0}
 
 -- Derived class method new
 
-function ComputerConnection:new (o, lastAnnounce)
-   o = o or {};
+function ComputerConnection:new (lastAnnounce)
+   local o = o or {};
    setmetatable(o, self);
    self.__index = self;
    self.lastAnnounce = lastAnnounce or 0;
@@ -34,8 +34,8 @@ local function WatchTerminalForCommand()
     local history = { "potato", "orange", "apple" }
     while true do
         write("> ");
-        local msg = read(nil, history)
-        if string.find(msg, "printId ") == 1 then
+        local msg = read(nil, history);
+        if string.find(msg, "printId") == 1 then
             local connectionList = "connected ids: ";
             for computerId, Connection in pairs(allTurtles) do
                 connectionList = connectionList .. computerId .. ", "
