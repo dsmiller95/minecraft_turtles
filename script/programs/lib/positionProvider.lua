@@ -1,7 +1,7 @@
 
 
 local currentPosition = vector.new(gps.locate());
-print("found position: " .. currentPosition);
+print("found position: " .. currentPosition:tostring());
 
 -- range from 0 to 3
 local currentDirection = nil;
@@ -25,7 +25,8 @@ end
 local function MoveDown()
     local didMove, error = turtle.down();
     if didMove then
-        currentPosition.y = currentPosition.y + 1;
+        currentPosition.y = currentPosition.y - 1;
+        return true;
     end
     return didMove, error;
 end
@@ -37,7 +38,7 @@ local function DeriveDirectionAfterMove()
     for i = 0, 3 do
         local directionVect = directionToDiff[i + 1];
         if directionVect == diff then
-            print("found direction vector: " .. directionVect);
+            print("found direction vector: " .. directionVect:tostring());
             return i;
         end
     end
