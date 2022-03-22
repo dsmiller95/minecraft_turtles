@@ -44,7 +44,7 @@ local function WatchTerminalForCommand()
         elseif string.find(msg, "executeRPC ") == 1 then
             local s, e, id, command = string.find(msg, "executeRPC (%d+) (.*)");
             print("target computer: '" .. id .. "' target command: '" .. command .. "'");
-            rednet.send(id, command, "RPC");
+            rednet.send(tonumber(id), command, "RPC");
         else
             print("usage: printId or executeRPC");
         end
