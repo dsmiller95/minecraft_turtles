@@ -1,7 +1,10 @@
-
-
 local function WriteGithubCode(scriptPath, targetPath)
-    local request = http.get("https://raw.githubusercontent.com/dsmiller95/minecraft_turtles/main" .. scriptPath .. ".lua");
+    local request = http.get(
+        "https://raw.githubusercontent.com/dsmiller95/minecraft_turtles/main" .. scriptPath .. ".lua",
+        {
+            ["Cache-Control"] = "no-cache"
+        }
+    );
 
     local file = fs.open(targetPath .. ".lua", "w");
     file.write(request.readAll());
@@ -9,7 +12,11 @@ local function WriteGithubCode(scriptPath, targetPath)
     file.close();
 end
 
-local listingRequest = http.get("https://raw.githubusercontent.com/dsmiller95/minecraft_turtles/main/script/programListing.lua");
+local listingRequest = http.get(
+    "https://raw.githubusercontent.com/dsmiller95/minecraft_turtles/main/script/programListing.lua",
+    {
+        ["Cache-Control"] = "no-cache"
+    });
 local listingVal = listingRequest.readAll();
 listingRequest.close();
 local listings = loadstring(listingVal)()
