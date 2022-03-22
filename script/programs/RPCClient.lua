@@ -1,6 +1,7 @@
 local function PeriodicAnnounce()
      while true do
-        rednet.broadcast("Hello There", "ANC");
+        local x, y, z = gps.locate();
+        rednet.broadcast("Hello There. pos: ["..x..", "..y..", "..z"]", "ANC");
         os.sleep(5);
      end
 end
