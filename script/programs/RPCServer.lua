@@ -21,7 +21,7 @@ local function ListenForAnnounce()
         local id, message = rednet.receive("ANC");
         local existingConnection = allTurtles[id];
         local announceTime = os.time("ingame");
-        local s, e, x, y, z  = string.find(message, "pos: %[(%d+), (%d+), (%d+)%]")
+        local s, e, x, y, z  = string.find(message, "pos: %[(-?%d+), (-?%d+), (-?%d+)%]")
         local computerPos = vector.new(x, y, z);
         if not existingConnection then
             existingConnection = ComputerConnection:new(announceTime);
