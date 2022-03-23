@@ -7,7 +7,7 @@ local constants = require("lib.turtleMeshConstants");
 
 local CABLE_ITEM_SLOT = 1;
 local CHEST_ITEM_SLOT = 2;
-local MODEM_ITEM_SLOT = 2;
+local MODEM_ITEM_SLOT = 3;
 
 -- TODO:
     -- ensure sufficient fuel to complete the operation and/or has available fuel source
