@@ -15,6 +15,18 @@ local directionToDiff = {
     vector.new( 0, 0,-1),
 }
 
+local useSafeMode = true;
+
+local function ValidatePredictedPosition()
+    if not useSafeMode then
+        return;
+    end
+    local actualPosition = vector.new(gps.locate());
+    if currentPosition ~= actualPosition then
+        error("mismatch in position. Expected to be at (" ..currentPosition  .. ") but was actually at (" .. actualPosition .. ")");
+    end
+end
+
 local function UnitVectorToDirection(unitVector)
     for i = 0, 3 do
         local directionVect = directionToDiff[i + 1];
@@ -40,8 +52,10 @@ local function MoveUp()
     local didMove, error = turtle.up();
     if didMove then
         currentPosition.y = currentPosition.y + 1;
+        ValidatePredictedPosition();
         return true;
     end
+    ValidatePredictedPosition();
     return didMove, error;
 end
 local function MoveUpDigIfNeeded()
@@ -56,8 +70,10 @@ local function MoveDown()
     local didMove, error = turtle.down();
     if didMove then
         currentPosition.y = currentPosition.y - 1;
+        ValidatePredictedPosition();
         return true;
     end
+    ValidatePredictedPosition();
     return didMove, error;
 end
 
@@ -76,8 +92,10 @@ local function MoveForward()
             currentDirection = DeriveDirectionAfterMove();
         end
         currentPosition = currentPosition:add(directionToDiff[currentDirection + 1]);
+        ValidatePredictedPosition();
         return true;
     end
+    ValidatePredictedPosition();
     return didMove, error;
 end
 
@@ -97,8 +115,10 @@ local function MoveBack()
             currentDirection = (DeriveDirectionAfterMove() + 2) % 4;
         end
         currentPosition = currentPosition:add(directionToDiff[currentDirection + 1]);
+        ValidatePredictedPosition();
         return true;
     end
+    ValidatePredictedPosition();
     return didMove, error;
 end
 
