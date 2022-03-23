@@ -23,7 +23,7 @@ local function ValidatePredictedPosition()
     end
     local actualPosition = vector.new(gps.locate());
     if currentPosition ~= actualPosition then
-        error("mismatch in position. Expected to be at (" ..currentPosition  .. ") but was actually at (" .. actualPosition .. ")");
+        error("mismatch in position. Expected to be at (" .. currentPosition:tostring()  .. ") but was actually at (" .. actualPosition:tostring() .. ")");
     end
 end
 
