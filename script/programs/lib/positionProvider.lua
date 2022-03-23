@@ -31,7 +31,7 @@ local function DeriveDirectionAfterMove()
     local diff = nextPosition - currentPosition;
     local direction = UnitVectorToDirection(diff);
     if direction then
-        print("found direction: " .. direction:tostring());
+        print("found direction: " .. direction);
     end
     return direction;
 end
