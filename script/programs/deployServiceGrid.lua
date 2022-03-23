@@ -12,10 +12,10 @@ local function VerifyFuel()
 end
     -- move to a target chunk
 local function MoveToChunk(targetChunkX, targetChunkZ)
-    local target = vector.new(targetChunkX * 16, constants.NAVIGATIONN_LAYER_MIN, targetChunkZ * 16);
+    local target = vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN, targetChunkZ * 16);
     position.NavigateToPositionSafe(target);
 end
-    -- excavate 5-10 y-layers at some height. perhaps bottom of the map.
+    -- excavate layers at some height. perhaps bottom of the map.
 local function ExcavateChunkArea(layerHeight)
     position.PointInDirection(1, 0);
     for y = 1, layerHeight do
@@ -54,7 +54,8 @@ local function Execute(targetChunkX, targetChunkZ)
         error("not enough fuel to perform deploy operation", 100);
     end
     MoveToChunk(targetChunkX, targetChunkZ);
-    ExcavateChunkArea(constants.NAVIGATION_LAYER_ALLOCATION);
+    -- excavate only the layers needed to deploy the fuel grid
+    ExcavateChunkArea(constants.MESH_LAYER_MAX - constants.MESH_LAYER_MIN);
 end
 
 
