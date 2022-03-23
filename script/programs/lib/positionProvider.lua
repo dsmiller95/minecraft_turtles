@@ -1,3 +1,4 @@
+local fuelingTools = require("lib.fuelingTools");
 
 
 local currentPosition = vector.new(gps.locate());
@@ -125,9 +126,11 @@ end
 
 local function MoveToAltitude(desiredAltitude)
     while desiredAltitude > currentPosition.y do
+        fuelingTools.EnsureFueled();
         MoveUpDigIfNeeded();
     end
     while desiredAltitude < currentPosition.y do
+        fuelingTools.EnsureFueled();
         MoveDownDigIfNeeded();
     end
 end
@@ -163,6 +166,7 @@ local function NavigateToPositionSafe(desiredPosition)
             TurnLeft();
         end
         while desiredPosition.x ~= currentPosition.x do
+            fuelingTools.EnsureFueled();
             MoveForwardDigIfNeeded();
         end
     end
@@ -179,6 +183,7 @@ local function NavigateToPositionSafe(desiredPosition)
             TurnLeft();
         end
         while desiredPosition.z ~= currentPosition.z do
+            fuelingTools.EnsureFueled();
             MoveForwardDigIfNeeded();
         end
     end
