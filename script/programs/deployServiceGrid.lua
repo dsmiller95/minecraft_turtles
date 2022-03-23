@@ -61,19 +61,19 @@ local function PlaceCable(length)
 end
 local function PlaceCableGrid(targetChunkX, targetChunkZ)
     local target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16);
-    position.NavigateToPositionSafe(target);
-    position.PointInDirection(1, 0);
+    position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
+    position.PointInDirection(0, 1);
     PlaceCable(16)
 
     target = vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
-    position.NavigateToPositionSafe(target);
-    position.PointInDirection(0, 1);
+    position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
+    position.PointInDirection(1, 0);
     PlaceCable(16);
     
     -- place a modem and adjacent chest in the center of the grid
         -- once connected, inventory should be automatically managed
     target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 2, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
-    position.NavigateToPositionSafe(target);
+    position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 2);
     while turtle.digDown() do end
     build.PlaceBlockFromSlotSafeDown(MODEM_ITEM_SLOT);
     position.upWithDig();

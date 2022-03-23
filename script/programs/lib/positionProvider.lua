@@ -168,7 +168,7 @@ local function MoveToAltitude(desiredAltitude)
     end
 end
 
-local function NavigateToPositionSafe(desiredPosition)
+local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride)
     if not currentDirection then
         -- move around to get the direction
         if not MoveForward() and not MoveBack() then
@@ -191,6 +191,9 @@ local function NavigateToPositionSafe(desiredPosition)
 
     -- move up or down into my navigation layer
     local targetY = constants.NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
+    if optionalTransitHeightOverride then
+        targetY = optionalTransitHeightOverride;
+    end
     MoveToAltitude(targetY);
 
     -- move in the x direction
