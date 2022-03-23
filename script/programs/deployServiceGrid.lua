@@ -1,0 +1,9 @@
+-- TODO:
+    -- ensure sufficient fuel to complete the operation and/or has available fuel source
+    -- move to a target chunk
+    -- excavate 5-10 y-layers at some height. perhaps bottom of the map.
+    -- place grid of cable inside the chunk
+    -- place a modem and adjacent chest in the center of the grid
+        -- once connected, inventory should be automatically managed
+    -- alert the player to activate the modem
+    -- report job done to job server

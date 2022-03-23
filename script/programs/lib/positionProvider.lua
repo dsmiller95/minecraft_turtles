@@ -13,6 +13,19 @@ local directionToDiff = {
     vector.new( 0, 0,-1),
 }
 
+local function DeriveDirectionAfterMove()
+    -- we don't know what direction we're facing yet. take a measurement and figure it out
+    local nextPosition = vector.new(gps.locate());
+    local diff = nextPosition - currentPosition;
+    for i = 0, 3 do
+        local directionVect = directionToDiff[i + 1];
+        if directionVect == diff then
+            print("found direction vector: " .. directionVect:tostring());
+            return i;
+        end
+    end
+end
+
 local function MoveUp()
     local didMove, error = turtle.up();
     if didMove then
@@ -20,6 +33,13 @@ local function MoveUp()
         return true;
     end
     return didMove, error;
+end
+local function MoveUpDigIfNeeded()
+    if not MoveUp() then
+        -- todo: make sure we don't dig another turtle
+        while turtle.digUp() do end
+        MoveUp()
+    end
 end
 
 local function MoveDown()
@@ -31,16 +51,11 @@ local function MoveDown()
     return didMove, error;
 end
 
-local function DeriveDirectionAfterMove()
-    -- we don't know what direction we're facing yet. take a measurement and figure it out
-    local nextPosition = vector.new(gps.locate());
-    local diff = nextPosition - currentPosition;
-    for i = 0, 3 do
-        local directionVect = directionToDiff[i + 1];
-        if directionVect == diff then
-            print("found direction vector: " .. directionVect:tostring());
-            return i;
-        end
+local function MoveDownDigIfNeeded()
+    if not MoveDown() then
+        -- todo: make sure we don't dig another turtle
+        while turtle.digDown() do end
+        MoveDown()
     end
 end
 
@@ -56,6 +71,15 @@ local function MoveForward()
     return didMove, error;
 end
 
+local function MoveForwardDigIfNeeded()
+    if not MoveForward() then
+        -- todo: make sure we don't dig another turtle
+        -- inspect  name == "computercraft:turtle_normal"
+        while turtle.dig() do end
+        MoveForward()
+    end
+end
+
 local function MoveBack()
     local didMove, error = turtle.back();
     if didMove then
@@ -67,6 +91,7 @@ local function MoveBack()
     end
     return didMove, error;
 end
+
 
 local function TurnRight()
     local didMove, error = turtle.turnRight();
@@ -90,6 +115,78 @@ local function Position()
 end
 
 
+local NAVIGATION_LAYER_ALLOCATION = 10;
+local NAVIGATIONN_LAYER_MIN = 10;
+
+
+local function GetReservedNavigationLayer()
+    return os.getComputerID() % NAVIGATION_LAYER_ALLOCATION
+end
+
+local function MoveToAltitude(desiredAltitude)
+    while desiredAltitude > currentPosition.y do
+        MoveUpDigIfNeeded();
+    end
+    while desiredAltitude < currentPosition.y do
+        MoveDownDigIfNeeded();
+    end
+end
+
+local function NavigateToPositionSafe(desiredPosition)
+    -- navigate away from reserved coords in chunks
+    if currentPosition.x % 16 == 8 then
+        if currentDirection % 2 == 0 then
+            TurnLeft()
+        end
+        MoveForwardDigIfNeeded();
+    end
+    if currentPosition.z % 16 == 8 then
+        if currentDirection % 2 == 1 then
+            TurnLeft();
+        end
+        MoveForwardDigIfNeeded();
+    end
+
+    -- move up or down into my navigation layer
+    local targetY = NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
+    MoveToAltitude(targetY);
+
+    -- move in the x direction
+    local desiredRotation = nil;
+    if desiredPosition.x > currentPosition.x then
+        desiredRotation = 0;
+    elseif desiredPosition.x < currentPosition.x then
+        desiredRotation = 2;
+    end
+    if desiredRotation then
+        while currentDirection ~= desiredRotation do
+            TurnLeft();
+        end
+        while desiredPosition.x ~= currentPosition.x do
+            MoveForwardDigIfNeeded();
+        end
+    end
+    
+    -- move in the z direction
+    local desiredRotation = nil;
+    if desiredPosition.z > currentPosition.z then
+        desiredRotation = 1;
+    elseif desiredPosition.z < currentPosition.z then
+        desiredRotation = 3;
+    end
+    if desiredRotation then
+        while currentDirection ~= desiredRotation do
+            TurnLeft();
+        end
+        while desiredPosition.z ~= currentPosition.z do
+            MoveForwardDigIfNeeded();
+        end
+    end
+
+    MoveToAltitude(desiredPosition.y);
+end
+
+
 return {
     up=MoveUp,
     down=MoveDown,
@@ -98,4 +195,5 @@ return {
     turnRight=TurnRight,
     turnLeft=TurnLeft,
     Position=Position,
+    NavigateToPositionSafe = NavigateToPositionSafe
 }
