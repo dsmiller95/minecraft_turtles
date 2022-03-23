@@ -138,8 +138,7 @@ end
 local function NavigateToPositionSafe(desiredPosition)
     if not currentDirection then
         -- move around to get the direction
-        if not MoveForward() then
-        elseif not MoveBack() then
+        if not MoveForward() and not MoveBack() then
             MoveForwardDigIfNeeded();
         end
     end
