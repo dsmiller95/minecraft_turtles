@@ -136,6 +136,13 @@ local function MoveToAltitude(desiredAltitude)
 end
 
 local function NavigateToPositionSafe(desiredPosition)
+    if not currentDirection then
+        -- move around to get the direction
+        if not MoveForward() then
+        elseif not MoveBack() then
+            MoveForwardDigIfNeeded();
+        end
+    end
     -- navigate away from reserved coords in chunks
     if currentPosition.x % 16 == 8 then
         if currentDirection % 2 == 0 then
