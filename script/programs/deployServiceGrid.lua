@@ -21,12 +21,14 @@ local function ExcavateChunkArea(layerHeight)
     for y = 1, layerHeight do
         for z = 1, 8 do
             for x = 1, 15 do
+                fuelingTools.EnsureFueled();
                 position.forwardWithDig(); 
             end
             position.turnRight();
             position.forwardWithDig(); 
             position.turnRight();
             for x = 1, 15 do
+                fuelingTools.EnsureFueled();
                 position.forwardWithDig(); 
             end
             position.turnLeft();
@@ -35,6 +37,7 @@ local function ExcavateChunkArea(layerHeight)
         end
         position.turnLeft();
         for i = 1, 15 do
+            fuelingTools.EnsureFueled();
             position.forwardWithDig();
         end
         position.turnRight();
