@@ -1,4 +1,5 @@
 local fuelingTools = require("lib.fuelingTools");
+local constants = require("lib.turtleMeshConstants");
 
 
 local currentPosition = vector.new(gps.locate());
@@ -14,17 +15,25 @@ local directionToDiff = {
     vector.new( 0, 0,-1),
 }
 
+local function UnitVectorToDirection(unitVector)
+    for i = 0, 3 do
+        local directionVect = directionToDiff[i + 1];
+        if directionVect == unitVector then
+            return i;
+        end
+    end
+    return nil;
+end
+
 local function DeriveDirectionAfterMove()
     -- we don't know what direction we're facing yet. take a measurement and figure it out
     local nextPosition = vector.new(gps.locate());
     local diff = nextPosition - currentPosition;
-    for i = 0, 3 do
-        local directionVect = directionToDiff[i + 1];
-        if directionVect == diff then
-            print("found direction vector: " .. directionVect:tostring());
-            return i;
-        end
+    local direction = UnitVectorToDirection(diff);
+    if direction then
+        print("found direction vector: " .. directionVect:tostring());
     end
+    return direction;
 end
 
 local function MoveUp()
@@ -111,17 +120,41 @@ local function TurnLeft()
     return didMove, error;
 end
 
+local function PointInDirection(x, z)
+    if x == 0 and z == 0 or x ~= 0 and z ~= 0 then
+        error("invalid directon");
+    end
+
+    local targetRot = vector.new(0, 0, 0);
+    if x < 0 then
+        targetRot.x = -1;
+    elseif x > 0 then
+        targetRot.x = 1;
+    end
+
+    if z < 0 then
+        targetRot.z = -1;
+    elseif z > 0 then
+        targetRot.z = 1;
+    end
+
+    local targetDirection = UnitVectorToDirection(targetRot);
+    if not targetDirection then
+        error("invalid direction");
+    end
+
+    while currentDirection ~= targetDirection do
+        TurnLeft();
+    end
+end
+
 local function Position()
     return currentPosition
 end
 
 
-local NAVIGATION_LAYER_ALLOCATION = 10;
-local NAVIGATIONN_LAYER_MIN = 10;
-
-
 local function GetReservedNavigationLayer()
-    return os.getComputerID() % NAVIGATION_LAYER_ALLOCATION
+    return os.getComputerID() % constants.NAVIGATION_LAYER_ALLOCATION
 end
 
 local function MoveToAltitude(desiredAltitude)
@@ -157,7 +190,7 @@ local function NavigateToPositionSafe(desiredPosition)
     end
 
     -- move up or down into my navigation layer
-    local targetY = NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
+    local targetY = constants.NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
     MoveToAltitude(targetY);
 
     -- move in the x direction
@@ -200,11 +233,15 @@ end
 
 return {
     up=MoveUp,
+    upWithDig=MoveUpDigIfNeeded,
     down=MoveDown,
+    downWithDig=MoveDownDigIfNeeded,
     forward=MoveForward,
+    forwardWithDig=MoveForwardDigIfNeeded,
     back=MoveBack,
     turnRight=TurnRight,
     turnLeft=TurnLeft,
     Position=Position,
-    NavigateToPositionSafe = NavigateToPositionSafe
+    NavigateToPositionSafe = NavigateToPositionSafe,
+    PointInDirection = PointInDirection
 }
