@@ -95,7 +95,7 @@ local function Execute(targetChunkX, targetChunkZ)
 
     print("waiting for active modem. press enter when modem activated....");
     read();
-    print("modem activated confirmed. reporting grid chunk " .. targetChunkX .. ", " .. targetChunkZ " as fueled");
+    print("modem activated confirmed. reporting grid chunk " .. targetChunkX .. ", " .. targetChunkZ .. " as fueled");
 end
 
 
