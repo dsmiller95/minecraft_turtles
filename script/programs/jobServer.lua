@@ -32,7 +32,7 @@ end
 
 local function PeriodicAnnounce()
     while true do
-       rednet.broadcast("Job count: " .. table.maxn(allJobs) - 1, "JOBANC");
+       rednet.broadcast("Job count: " .. table.maxn(allJobs), "JOBANC");
        os.sleep(5);
     end
 end
