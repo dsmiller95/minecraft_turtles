@@ -96,7 +96,7 @@ local function QueueJobs()
             print("jobs:");
             for _, job in pairs(allJobs) do
                 os.sleep(1);
-                print(job.claimedComputerId .. ":" .. job.status .. ":" .. job.command);
+                print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command);
             end
         elseif string.find(msg, "queue ") == 1 then
             local s, e, command = string.find(msg, "queue {(.*)}");

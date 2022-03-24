@@ -33,7 +33,7 @@ end
 
 local function PollForAndRunJobs()
     while true do
-        if not TryFindJob then
+        if not TryFindJob() then
             os.sleep(5);
         end
     end
