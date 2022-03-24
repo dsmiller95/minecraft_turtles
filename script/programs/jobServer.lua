@@ -39,7 +39,7 @@ end
 
 local function UpdateJob(claimantId, msg)
     local s, e, newStatus = string.find(msg, "Update (.+)");
-    local updateTime = os.time("ingame");
+    local updateTime = os.epoch("ingame");
 
     local jobIndex = indexOf(allJobs, 
         function(job)
@@ -71,7 +71,7 @@ local function AllocateJob(claimantId, msg)
     end
 
     local job = allJobs[firstAvialableJobIndex];
-    job.lastUpdateFromClaimant = os.time("ingame");
+    job.lastUpdateFromClaimant = os.epoch("ingame");
     job.claimedComputerId = claimantId;
     job.status = "CLAIMED"
     rednet.send(claimantId, "SUCCESS. JOBCOMMAND{".. job.command .."}", "JOBACK");
@@ -97,7 +97,8 @@ local function QueueJobs()
             print("jobs:");
             for _, job in pairs(allJobs) do
                 os.sleep(1);
-                print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command .. ":" .. (job.lastUpdateFromClaimant or "never"));
+                local claimTime = os.date(nil, (job.lastUpdateFromClaimant or 0) / 1000);
+                print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command .. ":" .. claimTime);
             end
         elseif string.find(msg, "queue ") == 1 then
             local s, e, command = string.find(msg, "queue {(.*)}");
