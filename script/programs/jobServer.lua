@@ -89,10 +89,11 @@ local function ServeJobs()
 end
 
 local function QueueJobs()
-    local history = { "potato", "orange", "apple" }
+    local history = { "ls", "queue" }
     while true do
         write("> ");
         local msg = read(nil, history);
+        table.insert(history, msg);
         if string.find(msg, "ls") == 1 then
             print("jobs:");
             for _, job in pairs(allJobs) do
