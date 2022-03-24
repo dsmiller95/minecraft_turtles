@@ -72,6 +72,7 @@ local function AllocateJob(claimantId, msg)
 
     local job = allJobs[firstAvialableJobIndex];
     job.lastUpdateFromClaimant = os.time("ingame");
+    job.claimedComputerId = claimantId;
     job.status = "CLAIMED"
     rednet.send(claimantId, "SUCCESS. JOBCOMMAND{".. job.command .."}", "JOBACK");
 end
@@ -96,7 +97,7 @@ local function QueueJobs()
             print("jobs:");
             for _, job in pairs(allJobs) do
                 os.sleep(1);
-                print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command);
+                print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command .. ":" .. (job.lastUpdateFromClaimant or "never"));
             end
         elseif string.find(msg, "queue ") == 1 then
             local s, e, command = string.find(msg, "queue {(.*)}");
