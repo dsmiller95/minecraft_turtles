@@ -87,7 +87,30 @@ local function ServeJobs()
     end
 end
 
+local function QueueJobs()
+    local history = { "potato", "orange", "apple" }
+    while true do
+        write("> ");
+        local msg = read(nil, history);
+        if string.find(msg, "ls") == 1 then
+            print("jobs:");
+            for _, job in pairs(allJobs) do
+                os.sleep(1);
+                print(job.claimedComputerId .. ":" .. job.status .. ":" .. job.command);
+            end
+        elseif string.find(msg, "queue ") == 1 then
+            local s, e, command = string.find(msg, "queue {(.*)}");
+            if not s then
+                print("invalid queue comannd. syntax: 'queue {JOBCOMMAND}'");
+            end
+            local newJob = Job:new(command);
+            table.insert(allJobs, newJob);
+        else
+            print("usage: 'ls' or 'queue'");
+        end
+    end
+end
 
 local modemName = peripheral.getName(peripheral.find("modem"));
 rednet.open(modemName);
-parallel.waitForAll(PeriodicAnnounce, ServeJobs)
+parallel.waitForAll(PeriodicAnnounce, ServeJobs, QueueJobs)
