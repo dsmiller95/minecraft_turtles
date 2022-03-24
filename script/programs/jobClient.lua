@@ -48,5 +48,7 @@ local function EmitJobUpdates()
     end
 end
 
-rednet.open("left");
+
+local modemName = peripheral.getName(peripheral.find("modem"));
+rednet.open(modemName);
 parallel.waitForAll(PollForAndRunJobs, EmitJobUpdates)

@@ -88,7 +88,6 @@ local function ServeJobs()
 end
 
 
-
-
-rednet.open("left");
+local modemName = peripheral.getName(peripheral.find("modem"));
+rednet.open(modemName);
 parallel.waitForAll(PeriodicAnnounce, ServeJobs)
