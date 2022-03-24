@@ -1,3 +1,5 @@
+local deployJob = require("jobs.deployServiceGrid");
+
 local isJobActive = false;
 local serverId = nil;
 
@@ -15,7 +17,8 @@ local function GetJob()
 end
 
 local function RunJob(job)
-    shell.run(job);
+    local jobFile = require(job);
+    jobFile.RunJob();
 end
 
 local function TryFindJob()

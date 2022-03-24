@@ -188,6 +188,13 @@ local function MoveToAltitude(desiredAltitude)
     end
 end
 
+local function EstimateMoveTimeCost(startPos, endPos)
+    -- simple manhattan distance calc
+    return math.abs(startPos.x - endPos.x)
+        + math.abs(startPos.y - endPos.y)
+        + math.abs(startPos.z - endPos.z)
+end
+
 local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride)
     if not currentDirection then
         -- move around to get the direction
@@ -266,5 +273,6 @@ return {
     turnLeft=TurnLeft,
     Position=Position,
     NavigateToPositionSafe = NavigateToPositionSafe,
-    PointInDirection = PointInDirection
+    PointInDirection = PointInDirection,
+    EstimateMoveTimeCost = EstimateMoveTimeCost
 }
