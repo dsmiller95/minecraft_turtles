@@ -3,11 +3,13 @@ local isJobActive = false;
 local function GetJob(serverId)
     rednet.send(serverId, "Request", "JOB");
     local id, response = rednet.receive("JOBACK");
+    print("job response: " .. response);
 
     local s, e, jobCommand = string.find(response, "JOBCOMMAND{(.*)}");
     if not s then
         return nil; -- no job found
     end
+    print("found job: " .. jobCommand);
     return jobCommand;
 end
 
@@ -18,7 +20,7 @@ end
 local function TryFindJob()
     local id, message = rednet.receive("JOBANC");
     local s, e, jobCount = string.find(message, "count: (%d+)");
-    if jobCount < 1 then
+    if tonumber(jobCount) < 1 then
         return false;
     end
     local job = GetJob(id);
