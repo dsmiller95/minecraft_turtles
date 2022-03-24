@@ -39,7 +39,7 @@ end
 
 local function UpdateJob(claimantId, msg)
     local s, e, newStatus = string.find(msg, "Update (.+)");
-    local updateTime = os.epoch("ingame");
+    local updateTime = os.epoch("utc");
 
     local jobIndex = indexOf(allJobs, 
         function(job)
@@ -71,7 +71,7 @@ local function AllocateJob(claimantId, msg)
     end
 
     local job = allJobs[firstAvialableJobIndex];
-    job.lastUpdateFromClaimant = os.epoch("ingame");
+    job.lastUpdateFromClaimant = os.epoch("utc");
     job.claimedComputerId = claimantId;
     job.status = "CLAIMED"
     rednet.send(claimantId, "SUCCESS. JOBCOMMAND{".. job.command .."}", "JOBACK");
