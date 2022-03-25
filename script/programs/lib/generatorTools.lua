@@ -3,6 +3,10 @@ function GetCommandsIterator(genFn)
     local co = coroutine.create(genFn)
     return function ()   -- iterator
       local code, res = coroutine.resume(co)
+      if not code then
+          print("error when generating next value");
+          print(res);
+      end
       return res
     end
 end

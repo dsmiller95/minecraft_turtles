@@ -21,12 +21,14 @@ end
 local function GenerateMoveChunkCommands()
     local initial = position.Position;
     local target = GetTargetInChunk();
+    print("yield move command");
     coroutine.yield({
         ex = function ()
             position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
         end,
         cost = position.EstimateMoveTimeCost(initial, target);
     });
+    print("yield move command done");
 end
     -- excavate layers at some height. perhaps bottom of the map.
 local excavateTimeRemaining = 0;
