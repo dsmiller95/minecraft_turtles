@@ -61,10 +61,10 @@ function CompositeInventory:updateActiveSlot()
 end
 
 
--- pull items from the target inventory into this composite
+-- pull items into this composite
 function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlot)
     if not self.isSink then
-        error("cannot push into source inventory");
+        error("cannot pull into source inventory");
     end
     while pullCount > 0 do
         local pulledItems = self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
@@ -78,10 +78,10 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
     return pullCount;
 end
 
--- push a certain number of items into the target inventory
+-- push items from this composite
 function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlot)
     if self.isSink then
-        error("cannot pull from sink inventory");
+        error("cannot push from sink inventory");
     end
     while pushCount > 0 do
         local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, pushCount, targetInventorySlot);
