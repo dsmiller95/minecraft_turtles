@@ -79,7 +79,12 @@ function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlo
         error("cannot pull from sink inventory");
     end
     while pushCount > 0 do
-        pushCount = pushCount - self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, pushCount, targetInventorySlot);
+        local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, pushCount, targetInventorySlot);
+        pushCount = pushCount - pushedItems;
+        if pushedItems <= 0 then
+            -- force next slot
+            self.currentSlot = self.currentSlot + 1;
+        end
         self:updateActiveSlot();
     end
     return pushCount;
@@ -97,6 +102,7 @@ function CompositeInventory:new(inventories, isSink)
    self.activeInventoryIndex = 1;
    self.currentSlot = 1;
    self.isSink = isSink;
+   self:updateActiveSlot();
    return o;
 end
 
