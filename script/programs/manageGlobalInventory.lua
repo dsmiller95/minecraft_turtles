@@ -95,16 +95,16 @@ function CompositeInventory:isComplete()
     return self.activeInventoryIndex > table.maxn(self.inventories);
 end
 
-function CompositeInventory:new(inventories, isSink)
-   local o = {};
-   setmetatable(o, self);
+function CompositeInventory:new(o, inventories, isSink)
+   local inv = o or {};
+   setmetatable(inv, self);
    self.__index = self;
-   self.inventories = inventories or {};
-   self.activeInventoryIndex = 1;
-   self.currentSlot = 1;
-   self.isSink = isSink;
-   self:updateActiveSlot();
-   return o;
+   inv.inventories = inventories or {};
+   inv.activeInventoryIndex = 1;
+   inv.currentSlot = 1;
+   inv.isSink = isSink;
+   inv:updateActiveSlot();
+   return inv;
 end
 
 
@@ -173,14 +173,14 @@ function DistributeInventory()
             table.maxn(outputNodes) .. " output nodes, and " .. 
             table.maxn(emptyNodes) .. " emptyNodes");
 
-    local cobbleSource = CompositeInventory:new(inputInventoriesByType["minecraft:cobblestone"], false);
+    local cobbleSource = CompositeInventory:new(nil, inputInventoriesByType["minecraft:cobblestone"], false);
     if cobbleSource:isComplete() then
         print("error: no cobbles?");
         return;
     end
-    local fuelSource = CompositeInventory:new(inputInventoriesByType["minecraft:coal"], false);
+    local fuelSource = CompositeInventory:new(nil, inputInventoriesByType["minecraft:coal"], false)
     if fuelSource:isComplete() then
-        fuelSource = CompositeInventory:new(inputInventoriesByType["minecraft:charcoal"], false)
+        fuelSource = CompositeInventory:new(nil, inputInventoriesByType["minecraft:charcoal"], false)
         if fuelSource:isComplete() then
             print("error: no fuels?"); 
             return;
@@ -192,7 +192,7 @@ function DistributeInventory()
         cobbleSource:pushN(2, empty, constants.INVENTORY_SLOTS.DATA_SLOT_1);
     end
 
-    local compositeOutput = CompositeInventory:new(outputNodes, true);
+    local compositeOutput = CompositeInventory:new(nil, outputNodes, true);
 
     for _, provider in pairs(providerNodes) do
         EmptyExtraToComposite(provider, compositeOutput);
