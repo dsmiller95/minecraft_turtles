@@ -80,6 +80,7 @@ local function GetTotalCommandCost(commands)
 end
 
 local function GenerateCablePlaceCommands()
+    print("genning calbe 1");
     local initial = GetTargetInChunk();
     local target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16);
     coroutine.yield({
@@ -96,6 +97,7 @@ local function GenerateCablePlaceCommands()
         cost = 16
     });
 
+    print("genning calbe 2");
     initial = target:add(vector.new(0, 0, 16));
     target = vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
     coroutine.yield ({
@@ -114,6 +116,7 @@ local function GenerateCablePlaceCommands()
     
     -- place a modem and adjacent chest in the center of the grid
         -- once connected, inventory should be automatically managed
+    print("genning modems");
     initial = target:add(vector.new(16, 0, 0));
     target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 2, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
     coroutine.yield({
@@ -134,8 +137,11 @@ local function GenerateCablePlaceCommands()
 end
 
 local function GenerateCommands()
+    print("getting chunk commands");
     GenerateMoveChunkCommands();
+    print("getting placement commands");
     GenerateCablePlaceCommands();
+    print("done");
 end
 local function GetAllCommandsList()
     return generatorTools.GetListFromGeneratorFunction(function() GenerateCommands() end);

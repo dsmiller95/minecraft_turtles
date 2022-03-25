@@ -9,5 +9,5 @@ return {
         "lib/rednetHelpers", "lib/generatorTools",
         "jobs/deployServiceGrid", "jobs/dummyJob"
     },
-    version = "1.0.70"
+    version = "1.0.71"
 };
