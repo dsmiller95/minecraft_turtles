@@ -1,10 +1,15 @@
 local function WriteGithubCode(scriptPath, targetPath)
+    local url = "https://raw.githubusercontent.com/dsmiller95/minecraft_turtles/main" .. scriptPath .. ".lua";
     local request = http.get(
-        "https://raw.githubusercontent.com/dsmiller95/minecraft_turtles/main" .. scriptPath .. ".lua",
+        url,
         {
             ["Cache-Control"] = "no-cache"
         }
     );
+
+    if not request then
+        error("error requesting: " .. url);
+    end
 
     local file = fs.open(targetPath .. ".lua", "w");
     file.write(request.readAll());
