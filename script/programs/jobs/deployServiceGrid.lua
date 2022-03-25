@@ -21,12 +21,12 @@ end
 local function GenerateMoveChunkCommands()
     local initial = position.Position;
     local target = GetTargetInChunk();
-    coroutine.yield{
+    coroutine.yield({
         ex = function ()
             position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
         end,
         cost = position.EstimateMoveTimeCost(initial, target);
-    };
+    });
 end
     -- excavate layers at some height. perhaps bottom of the map.
 local excavateTimeRemaining = 0;
@@ -82,47 +82,47 @@ end
 local function GenerateCablePlaceCommands()
     local initial = GetTargetInChunk();
     local target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16);
-    coroutine.yield{
+    coroutine.yield({
         ex = function ()
             position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
             position.PointInDirection(0, 1);
         end,
         cost = position.EstimateMoveTimeCost(initial, target);
-    };
-    coroutine.yield{
+    });
+    coroutine.yield({
         ex = function ()
             PlaceCable(16);
         end,
         cost = 16
-    }
+    });
 
     initial = target:add(vector.new(0, 0, 16));
     target = vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
-    coroutine.yield {
+    coroutine.yield ({
         ex = function ()
             position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
             position.PointInDirection(1, 0);
         end,
         cost = position.EstimateMoveTimeCost(initial, target);
-    };
-    coroutine.yield{
+    });
+    coroutine.yield({
         ex = function ()
             PlaceCable(16);
         end,
         cost = 16
-    };
+    });
     
     -- place a modem and adjacent chest in the center of the grid
         -- once connected, inventory should be automatically managed
     initial = target:add(vector.new(16, 0, 0));
     target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 2, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
-    coroutine.yield{
+    coroutine.yield({
         ex = function ()
             position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 2);
         end,
         cost = position.EstimateMoveTimeCost(initial, target);
-    };
-    coroutine.yield{
+    });
+    coroutine.yield({
         ex = function ()
             while turtle.digDown() do end
             build.PlaceBlockFromSlotSafeDown(MODEM_ITEM_SLOT);
@@ -130,16 +130,15 @@ local function GenerateCablePlaceCommands()
             build.PlaceBlockFromSlotSafeDown(CHEST_ITEM_SLOT);
         end,
         cost = 4
-    };
+    });
 end
 
 local function GenerateCommands()
     GenerateMoveChunkCommands();
     GenerateCablePlaceCommands();
-    coroutine.yield(nil);
 end
 local function GetAllCommandsList()
-    return generatorTools.GetListFromGeneratorFunction(GenerateCommands);
+    return generatorTools.GetListFromGeneratorFunction(function() GenerateCommands() end);
 end
 
 local commandTimeRemaining = 0;
