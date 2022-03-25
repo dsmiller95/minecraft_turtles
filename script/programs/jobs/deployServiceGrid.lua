@@ -133,8 +133,9 @@ local function GenerateCablePlaceCommands()
 end
 
 local function GenerateCommands()
-    GenerateCablePlaceCommands();
     GenerateMoveChunkCommands();
+    GenerateCablePlaceCommands();
+    coroutine.yield(nil);
 end
 function GetCommandsIterator()
     local co = coroutine.create(function () GenerateCommands() end)
@@ -168,10 +169,6 @@ end
 
 
 local function Execute(chunkX, chunkZ)
-    if not VerifyFuel() then
-        error("not enough fuel to perform deploy operation", 100);
-    end
-
     targetChunkX = chunkX;
     targetChunkZ = chunkZ;
 
