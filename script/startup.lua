@@ -27,8 +27,5 @@ shell.run("rm", "programs")
 for _, program in ipairs(listings.allPrograms) do
     WriteGithubCode("/script/programs/" .. program, "/programs/" .. program)
 end
-for _, library in ipairs(listings.allLibs) do
-    WriteGithubCode("/script/programs/lib/" .. library, "/programs/lib/" .. library)
-end
 
 print("finished loading. library version: " .. listings.version);

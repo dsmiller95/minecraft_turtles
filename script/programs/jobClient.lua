@@ -8,17 +8,31 @@ local function GetJob()
     local id, response = rednet.receive("JOBACK");
     print("job response: " .. response);
 
-    local s, e, jobCommand = string.find(response, "JOBCOMMAND{(.*)}");
+    local s, e, jobCommand = string.find(response, "JOB{(.*)}");
     if not s then
         return nil; -- no job found
     end
     print("found job: " .. jobCommand);
-    return jobCommand;
+    return {
+        job = jobCommand
+    };
 end
 
 local function RunJob(job)
-    local jobFile = require(job);
-    jobFile.RunJob();
+    local paramList={}
+    for str in string.gmatch(job.job, "([^ ]+)") do
+            table.insert(paramList, str)
+    end
+    if table.maxn(paramList) < 1 then
+        error("invalid job, no job id");
+    end
+    local jobFile = require("jobs." .. paramList[1]);
+    table.remove(paramList, 1);
+    jobFile.RunJob(
+        function (time)
+            print("remaining time" .. time);
+        end,
+        unpack(paramList));
 end
 
 local function TryFindJob()
@@ -33,7 +47,7 @@ local function TryFindJob()
         return false;
     end
     isJobActive = true;
-    RunJob(job)
+    RunJob(job);
     isJobActive = false;
     rednet.send(serverId, "Update COMPLETE", "JOB");
 end

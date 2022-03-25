@@ -22,9 +22,7 @@ local function GetTargetInChunk()
     return vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN, targetChunkZ * 16);
 end
 local moveChunkTimeRemaining = 0;
-local function PrepareMoveToChunk(targetX, targetZ)
-    targetChunkX = targetX;
-    targetChunkZ = targetZ;
+local function PrepareMoveToChunk()
     moveChunkTimeRemaining = position.EstimateMoveTimeCost(position.Position, GetTargetInChunk());
 end
 local function MoveToChunk()
@@ -137,7 +135,8 @@ local function PreparePlaceCable()
     });
     SetCablePlaceCost();
 end
-local function PlaceCableGrid(targetChunkX, targetChunkZ)
+
+local function PlaceCableGrid()
 
     while table.maxn(cablePlaceCommands) >= 1 do
         local command = cablePlaceCommands[1];
@@ -152,12 +151,15 @@ end
 
 
 
-local function Execute(targetChunkX, targetChunkZ)
+local function Execute(chunkX, chunkZ)
     if not VerifyFuel() then
         error("not enough fuel to perform deploy operation", 100);
     end
 
-    PrepareMoveToChunk(targetChunkX, targetChunkZ);
+    targetChunkX = chunkX;
+    targetChunkZ = chunkZ;
+
+    PrepareMoveToChunk();
     PreparePlaceCable();
 
     updateRemainingTimeCallback();
@@ -165,7 +167,7 @@ local function Execute(targetChunkX, targetChunkZ)
     MoveToChunk();
     -- excavate only the layers needed to deploy the fuel grid
     --ExcavateChunkArea(constants.MESH_LAYER_MAX - constants.MESH_LAYER_MIN);
-    PlaceCableGrid(targetChunkX, targetChunkZ);
+    PlaceCableGrid();
 
     print("waiting for active modem. press enter when modem activated....");
     read();
@@ -174,13 +176,11 @@ end
 
 
 
-local function RunJob(updateRemainingTime, onComplete, params)
-    updateRemainingTime(100);
+local function RunJob(updateRemainingTime, params)
     updateRemainingTimeCallback = function ()
         updateRemainingTime(moveChunkTimeRemaining + cableTimeRemaining);
     end;
     Execute(params[1], params[2]);
-    onComplete();
 end
 
 return {RunJob = RunJob}

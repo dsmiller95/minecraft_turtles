@@ -74,7 +74,7 @@ local function AllocateJob(claimantId, msg)
     job.lastUpdateFromClaimant = os.epoch("utc");
     job.claimedComputerId = claimantId;
     job.status = "CLAIMED"
-    rednet.send(claimantId, "SUCCESS. JOBCOMMAND{".. job.command .."}", "JOBACK");
+    rednet.send(claimantId, "SUCCESS. JOB{".. job.command .."}", "JOBACK");
 end
 
 local function ServeJobs()

@@ -1,6 +1,9 @@
 
 return {
-    allPrograms = {"spiralTurtle", "straightTurtle", "mineToFloor", "patternPrint", "RPCClient", "RPCServer", "deployServiceGrid", "jobClient", "jobServer"},
-    allLibs = {"fuelingTools", "buildingTools", "inventoryTools", "positionProvider", "turtleMesh", "turtleMeshConstants"},
-    version = "1.0.40"
+    allPrograms = {
+        "spiralTurtle", "straightTurtle", "mineToFloor", "patternPrint", "RPCClient", "RPCServer", "deployServiceGrid", "jobClient", "jobServer",
+        "lib/fuelingTools", "lib/buildingTools", "lib/inventoryTools", "lib/positionProvider", "lib/turtleMesh", "lib/turtleMeshConstants",
+        "jobs/deployServiceGrid", "jobs/dummyJob"
+    },
+    version = "1.0.41"
 };
