@@ -3,8 +3,8 @@ local constants = require("lib.turtleMeshConstants");
 
 
 local function GetChunkFromPosition(vectorPos)
-    local x = ((vectorPos.x / 16) % 1);
-    local z = ((vectorPos.z / 16) % 1);
+    local x = math.floor(vectorPos.x / 16);
+    local z = math.floor(vectorPos.z / 16);
     return x, z;
 end
 
