@@ -32,7 +32,7 @@ local function RunJob(job)
         function (time)
             print("remaining time" .. time);
         end,
-        unpack(paramList));
+        paramList);
 end
 
 local function TryFindJob()
