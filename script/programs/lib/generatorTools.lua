@@ -15,8 +15,10 @@ local function GetListFromGeneratorFunction(genFn)
 end
 
 local function Incrementor(limit)
-    for i = 1, limit do
-        coroutine.yield(i);
+    return function ()
+        for i = 1, limit do
+            coroutine.yield(i);
+        end 
     end
 end
 
