@@ -6,7 +6,7 @@ return {
         "RPCClient", "RPCServer",
         "jobClient", "jobServer", "runJob",
         "lib/fuelingTools", "lib/buildingTools", "lib/inventoryTools", "lib/positionProvider", "lib/turtleMesh", "lib/turtleMeshConstants",
-        "lib/rednetHelpers",
+        "lib/rednetHelpers", "lib/generatorTools",
         "jobs/deployServiceGrid", "jobs/dummyJob"
     },
     version = "1.0.67"
