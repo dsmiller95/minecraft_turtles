@@ -261,6 +261,17 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
 end
 
 
+local function NavigateToPositionAsCommand(estimatedStartPos, endPos, optionalTransitHeightOverride)
+    
+    coroutine.yield({
+        ex = function ()
+            NavigateToPositionSafe(endPos, optionalTransitHeightOverride);
+        end,
+        cost = EstimateMoveTimeCost(estimatedStartPos, endPos);
+    });
+end
+
+
 return {
     up=MoveUp,
     upWithDig=MoveUpDigIfNeeded,
@@ -273,6 +284,7 @@ return {
     turnLeft=TurnLeft,
     Position=Position,
     NavigateToPositionSafe = NavigateToPositionSafe,
+    NavigateToPositionAsCommand = NavigateToPositionAsCommand,
     PointInDirection = PointInDirection,
     EstimateMoveTimeCost = EstimateMoveTimeCost
 }

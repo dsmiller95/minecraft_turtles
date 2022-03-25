@@ -19,15 +19,11 @@ local function GetTargetInChunk()
     return vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN, targetChunkZ * 16);
 end
 local function GenerateMoveChunkCommands()
-    local initial = position.Position;
+    local initial = position.Position();
     local target = GetTargetInChunk();
     print("yield move command");
-    coroutine.yield({
-        ex = function ()
-            position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
-        end,
-        cost = position.EstimateMoveTimeCost(initial, target);
-    });
+    
+    position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 1);
     print("yield move command done");
 end
     -- excavate layers at some height. perhaps bottom of the map.
@@ -85,15 +81,10 @@ local function GenerateCablePlaceCommands()
     print("genning calbe 1");
     local initial = GetTargetInChunk();
     local target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16);
+    position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 1);
     coroutine.yield({
         ex = function ()
-            position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
             position.PointInDirection(0, 1);
-        end,
-        cost = position.EstimateMoveTimeCost(initial, target);
-    });
-    coroutine.yield({
-        ex = function ()
             PlaceCable(16);
         end,
         cost = 16
@@ -102,15 +93,10 @@ local function GenerateCablePlaceCommands()
     print("genning calbe 2");
     initial = target:add(vector.new(0, 0, 16));
     target = vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
-    coroutine.yield ({
-        ex = function ()
-            position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 1);
-            position.PointInDirection(1, 0);
-        end,
-        cost = position.EstimateMoveTimeCost(initial, target);
-    });
+    position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 1);
     coroutine.yield({
         ex = function ()
+            position.PointInDirection(1, 0);
             PlaceCable(16);
         end,
         cost = 16
@@ -121,12 +107,7 @@ local function GenerateCablePlaceCommands()
     print("genning modems");
     initial = target:add(vector.new(16, 0, 0));
     target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 2, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
-    coroutine.yield({
-        ex = function ()
-            position.NavigateToPositionSafe(target, constants.MESH_LAYER_MIN + 2);
-        end,
-        cost = position.EstimateMoveTimeCost(initial, target);
-    });
+    position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 2);
     coroutine.yield({
         ex = function ()
             while turtle.digDown() do end

@@ -6,6 +6,7 @@ function GetCommandsIterator(genFn)
       if not code then
           print("error when generating next value");
           print(res);
+          return nil;
       end
       return res
     end
