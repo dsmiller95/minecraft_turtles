@@ -18,7 +18,7 @@ local BulkStorageTypeByCount = {
 
 
 -- Meta class
-ItemSupply = {inventories = nil, inputSlot = nil, activeInventoryIndex = nil}
+CompositeInventory = {inventories = nil, currentSlot = nil, activeInventoryIndex = nil, isSink = nil}
 
 -- Derived class method new
 
@@ -30,51 +30,92 @@ function GetItemCount(inventory, slotNum)
     return details.count;
 end
 
-function ItemSupply:ActiveInventory()
+function CompositeInventory:ActiveInventory()
     return self.inventories [self.activeInventoryIndex];
 end
 
-function ItemSupply:CurrentItemCount()
-    return GetItemCount(self:ActiveInventory(), self.inputSlot);
+function CompositeInventory:CurrentItemCount()
+    return GetItemCount(self:ActiveInventory(), self.currentSlot);
 end
 
-function ItemSupply:updateActiveSlot()
+function CompositeInventory:IsCurrentSlotValid()
+    if self.isSink then
+        local diff = self:ActiveInventory().getItemLimit(self.currentSlot) - self:CurrentItemCount();
+        return diff > 0;
+    else    
+        return self:CurrentItemCount() > 0;
+    end
+end
+
+function CompositeInventory:updateActiveSlot()
     while self.activeInventoryIndex <= table.maxn(self.inventories) do
-        while self.inputSlot <= self:ActiveInventory().size() do
-            if self.inputSlot ~= constants.INVENTORY_SLOTS.DATA_SLOT_1 and self:CurrentItemCount() > 0 then
+        while self.currentSlot <= self:ActiveInventory().size() do
+            if self.currentSlot ~= constants.INVENTORY_SLOTS.DATA_SLOT_1 and self:IsCurrentSlotValid() then
                 return;
             end
-            self.inputSlot = self.inputSlot + 1;
+            self.currentSlot = self.currentSlot + 1;
         end
-        self.inputSlot = 1;
+        self.currentSlot = 1;
         self.activeInventoryIndex = self.activeInventoryIndex + 1;
     end
 end
 
-function ItemSupply:pushN(pushCount, targetInventory, targetInventorySlot)
+
+-- pull items from the target inventory into this composite
+function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlot)
+    if not self.isSink then
+        error("cannot push into source inventory");
+    end
+    while pullCount > 0 do
+        pullCount = pullCount - self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
+        self:updateActiveSlot();
+    end
+    return pullCount;
+end
+
+-- push a certain number of items into the target inventory
+function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlot)
+    if self.isSink then
+        error("cannot pull from sink inventory");
+    end
     while pushCount > 0 do
-        pushCount = pushCount - self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.inputSlot, pushCount, targetInventorySlot);
+        pushCount = pushCount - self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, pushCount, targetInventorySlot);
         self:updateActiveSlot();
     end
     return pushCount;
 end
 
-function ItemSupply:isEmpty()
+function CompositeInventory:isComplete()
     return self.activeInventoryIndex > table.maxn(self.inventories);
 end
 
-function ItemSupply:new (inventories)
+function CompositeInventory:new(inventories, isSink)
    local o = {};
    setmetatable(o, self);
    self.__index = self;
    self.inventories = inventories or {};
    self.activeInventoryIndex = 1;
-   self.inputSlot = 1;
+   self.currentSlot = 1;
+   self.isSink = isSink;
    return o;
 end
 
 
-
+function EmptyExtraToComposite(provider, compositeOutput)
+    if compositeOutput:isComplete() then
+        return;
+    end
+    -- unlabeled slots in provider nodes are sucked into output nodes
+    for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID, provider.size(), 1 do
+        local count = GetItemCount(provider, i);
+        if count > 0 then
+            compositeOutput:pullN(count, provider, i);
+            if compositeOutput:isComplete() then
+                return;
+            end
+        end
+    end
+end
 
 
 function DistributeInventory()
@@ -108,15 +149,21 @@ function DistributeInventory()
             table.maxn(emptyNodes) .. " emptyNodes");
 
     local cobbleInput = inputInventoriesByType["minecraft:cobblestone"];
-    local cobbleSource = ItemSupply:new(cobbleInput);
-    if cobbleSource:isEmpty() then
+    local cobbleSource = CompositeInventory:new(cobbleInput, false);
+    if cobbleSource:isComplete() then
         print("error: no cobbles?");
         return;
     end
     
+    -- empties become provider nodes
     for _, empty in pairs(emptyNodes) do
-        -- empties become provider nodes
         cobbleSource:pushN(2, empty, constants.INVENTORY_SLOTS.DATA_SLOT_1);
+    end
+
+    local compositeOutput = CompositeInventory:new(outputNodes, true);
+
+    for _, provider in pairs(providerNodes) do
+        EmptyExtraToComposite(provider, compositeOutput);
     end
 end
 

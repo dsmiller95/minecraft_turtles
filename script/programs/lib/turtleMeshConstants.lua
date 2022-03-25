@@ -10,7 +10,8 @@ return {
         MODEM = 3,
         CHEST = 4,
         DUMP = 5,
-        DATA_SLOT_1 = 10,
-        DATA_SLOT_2 = 11,
+        DATA_SLOT_1 = 6,
+        DATA_SLOT_2 = 7,
+        MAX_RESERVED_ID=7
     }
 }
