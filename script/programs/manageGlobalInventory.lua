@@ -145,10 +145,10 @@ function DistributeInventory()
     local outputNodes = {};
 
     for _, inventory in pairs(allInventories) do
-        local invSlots = inventory.size();
-        if invSlots == 1 then
+        local invName = peripheral.getName(inventory);
+        if string.find(invName, "storagedrawers") == 1 then
             -- single slots are input chests
-            local slot = inventory.getItemDetail(1);
+            local slot = inventory.getItemDetail(2);
             if slot then
                 local existingList = inputInventoriesByType[slot.name] or {};
                 table.insert(existingList, inventory);
