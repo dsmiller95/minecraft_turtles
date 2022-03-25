@@ -113,15 +113,27 @@ function EmptyExtraToComposite(providerChest, compositeOutput)
         return;
     end
     -- unlabeled slots in provider nodes are sucked into output nodes
-    for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID + 1, providerChest.size(), 1 do
-        local count = GetItemCount(providerChest, i);
-        if count > 0 then
-            compositeOutput:pullN(count, providerChest, i);
+
+    local allSlots = providerChest.list();
+
+    for invSlot, data in pairs(providerChest.list()) do
+        if invSlot > constants.INVENTORY_SLOTS.MAX_RESERVED_ID and data.count > 0 then
+            compositeOutput:pullN(data.count, providerChest, invSlot);
             if compositeOutput:isComplete() then
                 return;
             end
         end
     end
+
+    -- for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID + 1, providerChest.size(), 1 do
+    --     local count = GetItemCount(providerChest, i);
+    --     if count > 0 then
+    --         compositeOutput:pullN(count, providerChest, i);
+    --         if compositeOutput:isComplete() then
+    --             return;
+    --         end
+    --     end
+    -- end
 end
 
 function FillFuelSlot(providerChest, fuelSource)
@@ -201,5 +213,5 @@ end
 while true do
     
     DistributeInventory ();
-    os.sleep(0.3);
+    os.sleep(1);
 end
