@@ -19,7 +19,7 @@ local BulkStorageTypeByCount = {
 while true do
     
     -- todo: update this list via events instead of polling every time
-    local allInventories = peripheral.find("inventory");
+    local allInventories = { peripheral.find("inventory") };
 
     local unknownNodes = {};
 
@@ -34,7 +34,7 @@ while true do
         elseif data1.count == 1 then
             local data2 = inventory .getItemDetail(constants.INVENTORY_SLOTS.DATA_SLOT_2);
             local bulkType = (data2 and data2.count) or 0;
-            if bulkType > table.maxn(BulkStorageTypeByCount) then
+            if bulkType > table.maxn(BulkStorageTypeByCount) or bulkType <= 0 then
                 table.insert(unknownNodes, inventory)
             else
                 local existingList = bulkInventoriesByIndex[bulkType] or {};
@@ -53,6 +53,6 @@ while true do
             table.maxn(providerNodes) .. " provider nodes, " .. 
             table.maxn(outputNodes) .. " output nodes, and " .. 
             table.maxn(unknownNodes) .. " unknownNodes");
-    
+
     os.sleep(5);
 end
