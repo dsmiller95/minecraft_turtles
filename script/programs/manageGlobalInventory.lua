@@ -67,7 +67,12 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
         error("cannot push into source inventory");
     end
     while pullCount > 0 do
-        pullCount = pullCount - self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
+        local pulledItems = self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
+        pullCount = pullCount - pulledItems;
+        if pulledItems <= 0 then
+            -- force next slot. if the item can't be pulled in that means the stack must be full or incompatible
+            self.currentSlot = self.currentSlot + 1;
+        end
         self:updateActiveSlot();
     end
     return pullCount;
@@ -81,10 +86,6 @@ function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlo
     while pushCount > 0 do
         local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, pushCount, targetInventorySlot);
         pushCount = pushCount - pushedItems;
-        if pushedItems <= 0 then
-            -- force next slot
-            self.currentSlot = self.currentSlot + 1;
-        end
         self:updateActiveSlot();
     end
     return pushCount;
