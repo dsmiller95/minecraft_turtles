@@ -1,3 +1,5 @@
+local rednetHelpers    = require  ("lib.rednetHelpers ");
+
 local function PeriodicAnnounce()
      while true do
         local x, y, z = gps.locate();
@@ -6,14 +8,10 @@ local function PeriodicAnnounce()
      end
 end
 
-local function ListenAndExecute()
-    while true do
-        print("listening");
-        local sender, code = rednet.receive("RPC");
-        print("recieved command from " .. sender .. ": '" .. code .. "'");
-        shell.run(code);
-    end
+local function ExecuteCommand(senderId, message)
+    print("recieved command from " .. senderId .. ": '" .. message .. "'");
+    shell.run(code);
 end
 
 rednet.open("left");
-parallel.waitForAll(ListenAndExecute, PeriodicAnnounce)
+parallel.waitForAll(rednetHelpers.ListenFor("RPC", ExecuteCommand), PeriodicAnnounce)

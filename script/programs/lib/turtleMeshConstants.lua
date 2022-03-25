@@ -13,5 +13,10 @@ return {
         DATA_SLOT_1 = 6,
         DATA_SLOT_2 = 7,
         MAX_RESERVED_ID=7
+    },
+    CHUNK_STATUS = {
+        WILDERNESS = 0,
+        FUELED = 1,
+        MINED = 2
     }
 }

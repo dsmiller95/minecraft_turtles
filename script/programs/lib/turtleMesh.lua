@@ -2,16 +2,70 @@ local position = require("lib.positionProvider");
 local constants = require("lib.turtleMeshConstants");
 
 
-local function NavigateToChunkChest()
-    local x = ((position.Position().x / 16) % 1) + constants.FUEL_CHEST_COORDS_IN_CHUNK.x;
-    local z = ((position.Position().z / 16) % 1) + constants.FUEL_CHEST_COORDS_IN_CHUNK.z;
+local function GetChunkFromPosition(vectorPos)
+    local x = ((vectorPos.x / 16) % 1);
+    local z = ((vectorPos.z / 16) % 1);
+    return x, z;
+end
+
+local function NavigateToChunkChest(chunkX, chunkZ)
+    local x = chunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x;
+    local z = chunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z;
     local targetPosition = vector.new(x, constants.FUEL_CHEST_COORDS_IN_CHUNK.y + 1, z);
     position.NavigateToPositionSafe(targetPosition);
 end
 
 local function GetFuelInChunk()
-    NavigateToChunkChest();
+    NavigateToChunkChest(GetChunkFromPosition(position.Position()));
     turtle.suckDown();
 end
 
-return {GetFuelInChunk=GetFuelInChunk, NavigateToChunkChest=NavigateToChunkChest}
+
+local function GetChunkStatusFromServer(x, z)
+    local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
+    rednet.send(chunkServer, "status (" .. tostring(x) .. ", " .. tostring(z) .. ")");
+    local id, msg = rednet.receive("CHUNKRESP");
+    return msg;
+end
+
+local adjacents = {
+    { 1, 0},
+    { 0, 1},
+    {-1, 0},
+    { 0,-1},
+}
+
+local function GetFuelInChunkOrAdjacent(minimumRequiredFuel)
+    local chunkX, chunkZ = GetChunkFromPosition(position.Position());
+    local status = GetChunkStatusFromServer(chunkX, chunkZ);
+
+    local adjacentIndex = 1;
+    while status < constants.CHUNK_STATUS.FUELED do
+         status = GetChunkStatusFromServer(
+            chunkX + adjacents[adjacentIndex][1],
+            chunkX + adjacents[adjacentIndex][2])
+    end
+    if status < constants.CHUNK_STATUS  .FUELED then
+        error("no adjacent chunk has fuel available");
+    end
+    chunkX = chunkX + adjacents[adjacentIndex][1];
+    chunkZ = chunkX + adjacents[adjacentIndex][2];
+
+    NavigateToChunkChest(chunkX, chunkZ);
+    turtle.select(16);
+    if turtle.getItemCount() > 0 then
+        turtle.dropDown();
+    end
+    while turtle.getFuelLevel() < minimumRequiredFuel do
+        os.sleep(5);
+        turtle.suckDown();
+        turtle.refuel();
+    end
+end
+
+return {
+    GetFuelInChunk=GetFuelInChunk,
+    GetFuelInChunkOrAdjacent=GetFuelInChunkOrAdjacent,
+    NavigateToChunkChest=NavigateToChunkChest,
+    GetChunkStatusFromServer = GetChunkStatusFromServer,
+    GetChunkFromPosition=GetChunkFromPosition}
