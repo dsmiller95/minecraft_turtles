@@ -145,17 +145,26 @@ function DistributeInventory()
     local outputNodes = {};
 
     for _, inventory in pairs(allInventories) do
-        local data1 = inventory.getItemDetail(constants.INVENTORY_SLOTS.DATA_SLOT_1);
-        if not data1 then
-            table.insert(emptyNodes, inventory)
-        elseif data1.count == 2 then
-            table.insert(providerNodes, inventory)
-        elseif data1.count == 3 then
-            table.insert(outputNodes, inventory)
+        local invSlots = inventory.size();
+        if invSlots == 1 then
+            -- single slots are input chests
+            local slot = inventory.getItemDetail(1);
+            if slot then
+                local existingList = inputInventoriesByType[slot.name] or {};
+                table.insert(existingList, inventory);
+                inputInventoriesByType[slot.name] = existingList; 
+            end
         else
-            local existingList = inputInventoriesByType[data1.name] or {};
-            table.insert(existingList, inventory);
-            inputInventoriesByType[data1.name] = existingList;
+            local data1 = inventory.getItemDetail(constants.INVENTORY_SLOTS.DATA_SLOT_1);
+            if not data1 then
+                table.insert(emptyNodes, inventory)
+            elseif data1.count == 2 then
+                table.insert(providerNodes, inventory)
+            elseif data1.count == 3 then
+                table.insert(outputNodes, inventory)
+            else
+                table.insert(emptyNodes, inventory);
+            end
         end
     end
 
