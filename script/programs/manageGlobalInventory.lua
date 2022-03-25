@@ -18,7 +18,7 @@ local BulkStorageTypeByCount = {
 
 
 -- Meta class
-ItemSupply = {inventories = nil, inputSlot = nil}
+ItemSupply = {inventories = nil, inputSlot = nil, activeInventoryIndex = nil}
 
 -- Derived class method new
 
