@@ -20,7 +20,7 @@ local listingRequest = http.get(
 local listingVal = listingRequest.readAll();
 listingRequest.close();
 local listings = loadstring(listingVal)()
-print("loading library files...");
+print("loading library files version " .. listings.version);
 
 shell.run("rm", "programs")
 
