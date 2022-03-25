@@ -40,19 +40,20 @@ end
 
 function ItemSupply:updateActiveSlot()
     while self.activeInventoryIndex <= table.maxn(self.inventories) do
-        while self.inputSlot <= self.ActiveInventory().size() do
+        while self.inputSlot <= self:ActiveInventory().size() do
             self.inputSlot = self.inputSlot + 1;
             if self.inputSlot ~= constants.INVENTORY_SLOTS.DATA_SLOT_1 and self:CurrentItemCount() > 0 then
                 return;
             end
         end
+        self.inputSlot = 1;
         self.activeInventoryIndex = self.activeInventoryIndex + 1;
     end
 end
 
 function ItemSupply:pushN(pushCount, targetInventory, targetInventorySlot)
     while pushCount > 0 do
-        pushCount = pushCount - self.ActiveInventory().pushItems(peripheral.getName(targetInventory), self.inputSlot, pushCount, targetInventorySlot);
+        pushCount = pushCount - self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.inputSlot, pushCount, targetInventorySlot);
         self:updateActiveSlot();
     end
     return pushCount;
@@ -66,7 +67,7 @@ function ItemSupply:new (inventories)
    local o = {};
    setmetatable(o, self);
    self.__index = self;
-   self.inventories = inventories;
+   self.inventories = inventories or {};
    self.activeInventoryIndex = 1;
    self.inputSlot = 1;
    return o;
