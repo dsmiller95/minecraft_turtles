@@ -41,10 +41,10 @@ end
 function ItemSupply:updateActiveSlot()
     while self.activeInventoryIndex <= table.maxn(self.inventories) do
         while self.inputSlot <= self:ActiveInventory().size() do
-            self.inputSlot = self.inputSlot + 1;
             if self.inputSlot ~= constants.INVENTORY_SLOTS.DATA_SLOT_1 and self:CurrentItemCount() > 0 then
                 return;
             end
+            self.inputSlot = self.inputSlot + 1;
         end
         self.inputSlot = 1;
         self.activeInventoryIndex = self.activeInventoryIndex + 1;
