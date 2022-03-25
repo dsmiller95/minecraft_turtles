@@ -108,20 +108,29 @@ function CompositeInventory:new(inventories, isSink)
 end
 
 
-function EmptyExtraToComposite(provider, compositeOutput)
+function EmptyExtraToComposite(providerChest, compositeOutput)
     if compositeOutput:isComplete() then
         return;
     end
     -- unlabeled slots in provider nodes are sucked into output nodes
-    for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID, provider.size(), 1 do
-        local count = GetItemCount(provider, i);
+    for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID, providerChest.size(), 1 do
+        local count = GetItemCount(providerChest, i);
         if count > 0 then
-            compositeOutput:pullN(count, provider, i);
+            compositeOutput:pullN(count, providerChest, i);
             if compositeOutput:isComplete() then
                 return;
             end
         end
     end
+end
+
+function FillFuelSlot(providerChest, fuelSource)
+    if fuelSource:isComplete() then
+        return;
+    end
+    local currentCount = GetItemCount(providerChest, constants.INVENTORY_SLOTS.FUEL);
+    local maxCount = providerChest.getItemLimit(constants.INVENTORY_SLOTS.FUEL);
+    fuelSource:pushN(maxCount - currentCount, providerChest, constants.INVENTORY_SLOTS.FUEL);
 end
 
 
@@ -155,10 +164,14 @@ function DistributeInventory()
             table.maxn(outputNodes) .. " output nodes, and " .. 
             table.maxn(emptyNodes) .. " emptyNodes");
 
-    local cobbleInput = inputInventoriesByType["minecraft:cobblestone"];
-    local cobbleSource = CompositeInventory:new(cobbleInput, false);
+    local cobbleSource = CompositeInventory:new(inputInventoriesByType["minecraft:cobblestone"], false);
     if cobbleSource:isComplete() then
         print("error: no cobbles?");
+        return;
+    end
+    local fuelSource = CompositeInventory:new(inputInventoriesByType["minecraft:coal"], false);
+    if fuelSource:isComplete() then
+        print("error: no fuels?");
         return;
     end
     
@@ -171,11 +184,12 @@ function DistributeInventory()
 
     for _, provider in pairs(providerNodes) do
         EmptyExtraToComposite(provider, compositeOutput);
+        FillFuelSlot(provider, fuelSource);
     end
 end
 
 while true do
     
     DistributeInventory ();
-    os.sleep(5);
+    os.sleep(0.3);
 end
