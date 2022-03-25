@@ -138,8 +138,6 @@ function DistributeInventory()
     -- todo: update this list via events instead of polling every time
     local allInventories = { peripheral.find("inventory") };
 
-    local emptyNodes = {};
-
     local inputInventoriesByType = {};
     local providerNodes = {};
     local outputNodes = {};
@@ -155,23 +153,27 @@ function DistributeInventory()
                 inputInventoriesByType[slot.name] = existingList; 
             end
         else
+            -- provider nodes have data 1 count of 2 and data 2 count of 13
+            -- all others are assumed to be output chests
             local data1 = inventory.getItemDetail(constants.INVENTORY_SLOTS.DATA_SLOT_1);
             if not data1 then
-                table.insert(emptyNodes, inventory)
-            elseif data1.count == 2 then
-                table.insert(providerNodes, inventory)
-            elseif data1.count == 3 then
                 table.insert(outputNodes, inventory)
+            elseif data1.count == 2 then
+                local data2 = GetItemCount(inventory, constants .INVENTORY_SLOTS.DATA_SLOT_2);
+                if data2 == 13 then
+                    table.insert(providerNodes, inventory)
+                else
+                    table.insert    (outputNodes, inventory);
+                end
             else
-                table.insert(emptyNodes, inventory);
+                table.insert(outputNodes, inventory);
             end
         end
     end
 
     print("found " .. 
             table.maxn(providerNodes) .. " provider nodes, " .. 
-            table.maxn(outputNodes) .. " output nodes, and " .. 
-            table.maxn(emptyNodes) .. " emptyNodes");
+            table.maxn(outputNodes) .. " output nodes");
 
     local cobbleSource = CompositeInventory:new(nil, inputInventoriesByType["minecraft:cobblestone"], false);
     if cobbleSource:isComplete() then
@@ -187,10 +189,6 @@ function DistributeInventory()
         end
     end
     
-    -- empties become provider nodes
-    for _, empty in pairs(emptyNodes) do
-        cobbleSource:pushN(2, empty, constants.INVENTORY_SLOTS.DATA_SLOT_1);
-    end
 
     local compositeOutput = CompositeInventory:new(nil, outputNodes, true);
 
