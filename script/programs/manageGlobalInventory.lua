@@ -180,8 +180,11 @@ function DistributeInventory()
     end
     local fuelSource = CompositeInventory:new(inputInventoriesByType["minecraft:coal"], false);
     if fuelSource:isComplete() then
-        print("error: no fuels?");
-        return;
+        fuelSource = CompositeInventory:new(inputInventoriesByType["minecraft:charcoal"], false)
+        if fuelSource:isComplete() then
+            print("error: no fuels?"); 
+            return;
+        end
     end
     
     -- empties become provider nodes
