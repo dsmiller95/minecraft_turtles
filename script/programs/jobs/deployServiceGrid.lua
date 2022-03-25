@@ -4,6 +4,7 @@ local position = require("lib.positionProvider");
 local build = require("lib.buildingTools");
 local mesh = require("lib.turtleMesh");
 local constants = require("lib.turtleMeshConstants");
+local generatorTools = require("lib.generatorTools");
 
 local CABLE_ITEM_SLOT = 1;
 local CHEST_ITEM_SLOT = 2;
@@ -137,19 +138,8 @@ local function GenerateCommands()
     GenerateCablePlaceCommands();
     coroutine.yield(nil);
 end
-function GetCommandsIterator()
-    local co = coroutine.create(function () GenerateCommands() end)
-    return function ()   -- iterator
-      local code, res = coroutine.resume(co)
-      return res
-    end
-end
 local function GetAllCommandsList()
-    local allCommands= {};
-    for command in GetCommandsIterator() do
-        table.insert(allCommands, command);
-    end
-    return allCommands;
+    return generatorTools.GetListFromGeneratorFunction(GenerateCommands);
 end
 
 local commandTimeRemaining = 0;
