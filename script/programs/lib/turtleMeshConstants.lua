@@ -4,4 +4,13 @@ return {
     NAVIGATIONN_LAYER_MIN = 14,
     MESH_LAYER_MIN = 11,
     MESH_LAYER_MAX = 14,
+    INVENTORY_SLOTS = {
+        FUEL = 1,
+        NETWORK_CABLE = 2,
+        MODEM = 3,
+        CHEST = 4,
+        DUMP = 5,
+        DATA_SLOT_1 = 10,
+        DATA_SLOT_2 = 11,
+    }
 }
