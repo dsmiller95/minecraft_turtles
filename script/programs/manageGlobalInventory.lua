@@ -113,7 +113,7 @@ function EmptyExtraToComposite(providerChest, compositeOutput)
         return;
     end
     -- unlabeled slots in provider nodes are sucked into output nodes
-    for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID, providerChest.size(), 1 do
+    for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID + 1, providerChest.size(), 1 do
         local count = GetItemCount(providerChest, i);
         if count > 0 then
             compositeOutput:pullN(count, providerChest, i);
