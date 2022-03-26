@@ -65,6 +65,7 @@ local function UpdateChunkStatus(senderId, message)
         chunk = Chunk:new(x, z);
     end
     chunk.status = newStatus;
+    allChunks[index] = chunk;
     print("sending resp " .. tostring(senderId) .. " : " .. chunk.status);
     rednet.send(senderId, chunk.status, "CHUNKRESP");
 end

@@ -31,13 +31,14 @@ local function GetChunkStatusFromServer(x, z)
     if msg == "INVALID REQUEST" then
         error("invalid request sent to chunk server: " .. req)
     end
-    return msg;
+    return tonumber(msg);
 end
 local function SetChunkStatusOnServer(x, z, status)
     local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
-    rednet.send(chunkServer, "update (" .. tostring(x) .. ", " .. tostring(z) .. ") : {" .. status .. "}", "CHUNKREQ");
+    local statusCode = tonumber (status);
+    rednet.send(chunkServer, "update (" .. tostring(x) .. ", " .. tostring(z) .. ") : {" .. tostring(statusCode) .. "}", "CHUNKREQ");
     local id, msg = rednet.receive("CHUNKRESP");
-    return msg;
+    return tonumber(msg);
 end
 
 local adjacents = {
