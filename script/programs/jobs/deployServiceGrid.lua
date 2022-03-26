@@ -62,6 +62,7 @@ local function PlaceCable(length)
     for i = 1, (length - 1) do
         position.forwardWithDig();
         while turtle.digDown() do end
+        while turtle.digUp() do end
         build.PlaceBlockFromSlotSafeDown(CABLE_ITEM_SLOT);
     end
 end
