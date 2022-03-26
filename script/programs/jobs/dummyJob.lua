@@ -1,10 +1,16 @@
 
 
-local function RunJob(updateRemainingTime, params)
-    print(params[1])
+local function RunJob(params)
+    print(params[1]);
     for i = 1, 10, 1 do
-        updateRemainingTime(10 - i);
-        os.sleep(1);
+        coroutine.yield({
+            ex = function ()
+                print(10 - i);
+                os.sleep(1);
+            end,
+            cost = 1,
+            description = "wait 1s and print " .. tostring(10 - i)
+        });
     end
 end
 

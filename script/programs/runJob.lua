@@ -1,8 +1,9 @@
+local jobLib = require  ("lib.jobClientLibrary  ");
 
-local jobFile = require("jobs." .. arg[1]);
-table.remove(arg, 1);
-jobFile.RunJob(
-    function (time)
-        print("remaining time" .. time);
-    end,
-    arg);
+local jobCommand = table.concat(arg, " ");
+
+jobLib.InitLog();
+local success = jobLib.RunJob(jobCommand);
+jobLib.CloseLog()
+
+print("job success: " .. tostring(success));

@@ -57,13 +57,27 @@ local function UpdateJob(claimantId, msg)
     if job.status == "COMPLETE" then
         print("job completed");
         table.remove(allJobs, jobIndex);
+        return;
+    end
+    if job.status == "REJECTED" then
+        job.status = "UNCLAIMED";
+        job.claimedComputerId = nil;
     end
 end
 
 local function AllocateJob(claimantId, msg)
+    -- don't retry a job until 30s
+    local newestJob = os.epoch("utc") - 30 * 1000;
     local firstAvialableJobIndex = indexOf(allJobs,
         function(job)
-            return not job.claimedComputerId;
+            if not job.claimedComputerId then
+                if job.lastUpdateFromClaimant and job.lastUpdateFromClaimant > newestJob then
+                    -- reject if job has been updated recently. likely has been rejected.
+                    return false;
+                end
+                return true;
+            end
+            return false;
         end);
     if not firstAvialableJobIndex then
         rednet.send(claimantId, "INVALID: No Jobs", "JOBACK");
