@@ -73,6 +73,9 @@ end
 
 local function GetFuelInChunkOrAdjacent(minimumRequiredFuel)
     local chunkX, chunkZ = GetClosestConnectedChunk();
+    if not chunkX then
+        return false;
+    end
     NavigateToChunkChest(chunkX, chunkZ);
     turtle.select(16);
     if turtle.getItemCount() > 0 then
@@ -97,13 +100,15 @@ end
 
 local function EnsureMinimumFuelRequirementMet(minFuel)
     if turtle.getFuelLimit() < minFuel then
+        print("fuel required is greater than total capacity of this turtle");
         return false;
     end
 
-    if turtle.getFuelLevel() >= minFuel * 2 then
+    if turtle.getFuelLevel() >= minFuel then
         return true;
     end
 
+    print("aquiring fuel from the turtle mesh");
     return GetFuelInChunkOrAdjacent(minFuel);
 end
 
