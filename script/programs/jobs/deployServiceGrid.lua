@@ -12,6 +12,21 @@ local MODEM_ITEM_SLOT = 3;
 
 local updateRemainingTimeCallback = nil;
 
+local logFile;
+local function InitLog()
+    logFile = fs.open("deployServiceGrid.log", "w");
+    logFile.writeLine("Init log file");
+    logFile.flush();
+end
+local function CloseLog()
+    logFile.close();
+end
+local function LogInfo(msg)
+    print(msg);
+    logFile.writeLine(msg);
+    logFile.flush();
+end
+
 -- TODO:
     -- move to a target chunk
 local targetChunkX, targetChunkZ = nil, nil;
@@ -21,10 +36,10 @@ end
 local function GenerateMoveChunkCommands()
     local initial = position.Position();
     local target = GetTargetInChunk();
-    print("yield move command");
+    LogInfo("yield move command");
     
     position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 1);
-    print("yield move command done");
+    LogInfo("yield move command done");
 end
     -- excavate layers at some height. perhaps bottom of the map.
 local excavateTimeRemaining = 0;
@@ -78,7 +93,7 @@ local function GetTotalCommandCost(commands)
 end
 
 local function GenerateCablePlaceCommands()
-    print("genning calbe 1");
+    LogInfo("genning calbe 1");
     local initial = GetTargetInChunk();
     local target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16);
     position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 1);
@@ -91,7 +106,7 @@ local function GenerateCablePlaceCommands()
         description = "Place 16 cable"
     });
 
-    print("genning calbe 2");
+    LogInfo("genning calbe 2");
     initial = target:add(vector.new(0, 0, 16));
     target = vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN + 1, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
     position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 1);
@@ -106,7 +121,7 @@ local function GenerateCablePlaceCommands()
     
     -- place a modem and adjacent chest in the center of the grid
         -- once connected, inventory should be automatically managed
-    print("genning modems");
+        LogInfo("genning modems");
     initial = target:add(vector.new(16, 0, 0));
     target = vector.new(targetChunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x, constants.MESH_LAYER_MIN + 2, targetChunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z);
     position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 2);
@@ -123,11 +138,11 @@ local function GenerateCablePlaceCommands()
 end
 
 local function GenerateCommands()
-    print("getting chunk commands");
+    LogInfo("getting chunk commands");
     GenerateMoveChunkCommands();
-    print("getting placement commands");
+    LogInfo("getting placement commands");
     GenerateCablePlaceCommands();
-    print("done");
+    LogInfo("done");
 end
 local function GetAllCommandsList()
     return generatorTools.GetListFromGeneratorFunction(function() GenerateCommands() end);
@@ -150,12 +165,13 @@ end
 
 
 local function Execute(chunkX, chunkZ)
+    InitLog();
     targetChunkX = chunkX;
     targetChunkZ = chunkZ;
 
     local allCommands = GetAllCommandsList();
     for _, com in pairs(allCommands) do
-        print(com.description or "unknown command");
+        LogInfo(com.description or "unknown command");
     end
     commandTimeRemaining = GetTotalCommandCost(allCommands);
 
@@ -168,9 +184,13 @@ local function Execute(chunkX, chunkZ)
 
     ExecuteCommands(allCommands);
 
-    print("waiting for active modem. press enter when modem activated....");
+    local msg ="waiting for active modem. press enter when modem activated...."; 
+    LogInfo(msg);
     read();
-    print("modem activated confirmed. reporting grid chunk " .. targetChunkX .. ", " .. targetChunkZ .. " as fueled");
+    msg = "modem activated confirmed. reporting grid chunk " .. targetChunkX .. ", " .. targetChunkZ .. " as fueled";
+    LogInfo(msg);
+
+    CloseLog();
 end
 
 
