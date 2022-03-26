@@ -48,9 +48,11 @@ local function GetChunkData(senderId, message)
     local index = ToChunkIndex(x, z);
     local chunk = allChunks[index];
     if not chunk then
+        print("sending resp " .. tostring(senderId) .. " : " .. constants.CHUNK_STATUS.WILDERNESS);
         rednet.send(senderId, constants.CHUNK_STATUS.WILDERNESS,  "CHUNKRESP");
         return;
     end
+    print("sending resp " .. tostring(senderId) .. " : " .. chunk.status);
     rednet.send(senderId, chunk.status, "CHUNKRESP");
 end
 local function UpdateChunkStatus(senderId, message)
@@ -63,14 +65,19 @@ local function UpdateChunkStatus(senderId, message)
         chunk = Chunk:new(x, z);
     end
     chunk.status = newStatus;
+    print("sending resp " .. tostring(senderId) .. " : " .. chunk.status);
     rednet.send(senderId, chunk.status, "CHUNKRESP");
 end
 
 local function RespondToDataRequest(senderId, message)
+    print("got request " .. message);
     if string.find(message, "status") == 1 then
         GetChunkData(senderId, message);
     elseif string.find(message, "update") == 1 then
         UpdateChunkStatus(senderId, message);
+    else
+        print("sending resp " .. tostring(senderId) .. " : " .. chunk.status);
+        rednet.send(senderId, "INVALID REQUEST", "CHUNKRESP");
     end
 end
 
