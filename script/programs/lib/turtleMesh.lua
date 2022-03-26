@@ -25,7 +25,7 @@ local function GetChunkStatusFromServer(x, z)
     local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
     print("found chunk server" .. tostring(chunkServer));
     local req = "status (" .. tostring(x) .. ", " .. tostring(z) .. ")";
-    rednet.send(chunkServer, req);
+    rednet.send(chunkServer, req, "CHUNKREQ");
     print("sent request " .. tostring(chunkServer) .. " : " .. req);
     local id, msg = rednet.receive("CHUNKRESP");
     if msg == "INVALID REQUEST" then
@@ -35,7 +35,7 @@ local function GetChunkStatusFromServer(x, z)
 end
 local function SetChunkStatusOnServer(x, z, status)
     local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
-    rednet.send(chunkServer, "update (" .. tostring(x) .. ", " .. tostring(z) .. ") : {" .. status .. "}");
+    rednet.send(chunkServer, "update (" .. tostring(x) .. ", " .. tostring(z) .. ") : {" .. status .. "}", "CHUNKREQ");
     local id, msg = rednet.receive("CHUNKRESP");
     return msg;
 end
