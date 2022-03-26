@@ -87,7 +87,8 @@ local function GenerateCablePlaceCommands()
             position.PointInDirection(0, 1);
             PlaceCable(16);
         end,
-        cost = 16
+        cost = 16,
+        description = "Place 16 cable"
     });
 
     print("genning calbe 2");
@@ -99,7 +100,8 @@ local function GenerateCablePlaceCommands()
             position.PointInDirection(1, 0);
             PlaceCable(16);
         end,
-        cost = 16
+        cost = 16,
+        description = "Place 16 cable"
     });
     
     -- place a modem and adjacent chest in the center of the grid
@@ -115,7 +117,8 @@ local function GenerateCablePlaceCommands()
             position.upWithDig();
             build.PlaceBlockFromSlotSafeDown(CHEST_ITEM_SLOT);
         end,
-        cost = 4
+        cost = 4,
+        description = "place modem and chest"
     });
 end
 
@@ -151,6 +154,9 @@ local function Execute(chunkX, chunkZ)
     targetChunkZ = chunkZ;
 
     local allCommands = GetAllCommandsList();
+    for _, com in pairs(allCommands) do
+        print(com.description or "unknown command");
+    end
     commandTimeRemaining = GetTotalCommandCost(allCommands);
 
     -- ensure sufficient fuel to complete the operation and/or has available fuel source

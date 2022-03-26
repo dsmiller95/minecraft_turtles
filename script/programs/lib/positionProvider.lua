@@ -262,12 +262,13 @@ end
 
 
 local function NavigateToPositionAsCommand(estimatedStartPos, endPos, optionalTransitHeightOverride)
-    
     coroutine.yield({
         ex = function ()
+            print("navigating to " .. endPos:tostring());
             NavigateToPositionSafe(endPos, optionalTransitHeightOverride);
         end,
-        cost = EstimateMoveTimeCost(estimatedStartPos, endPos);
+        cost = EstimateMoveTimeCost(estimatedStartPos, endPos),
+        description = "Navigate to " .. endPos:tostring(),
     });
 end
 
