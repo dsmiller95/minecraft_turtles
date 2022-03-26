@@ -52,8 +52,7 @@ local adjacents = {
     {-1, 0},
     { 0,-1},
 }
-
-local function GetFuelInChunkOrAdjacent(minimumRequiredFuel)
+local function GetClosestConnectedChunk()
     local chunkX, chunkZ = GetChunkFromPosition(position.Position());
     local status = GetChunkStatusFromServer(chunkX, chunkZ);
 
@@ -64,20 +63,55 @@ local function GetFuelInChunkOrAdjacent(minimumRequiredFuel)
             chunkX + adjacents[adjacentIndex][2])
     end
     if status < constants.CHUNK_STATUS.FUELED then
-        error("no adjacent chunk has fuel available");
+        return nil;
     end
+
     chunkX = chunkX + adjacents[adjacentIndex][1];
     chunkZ = chunkX + adjacents[adjacentIndex][2];
+    return chunkX, chunkZ
+end
 
+local function GetFuelInChunkOrAdjacent(minimumRequiredFuel)
+    local chunkX, chunkZ = GetClosestConnectedChunk();
     NavigateToChunkChest(chunkX, chunkZ);
     turtle.select(16);
     if turtle.getItemCount() > 0 then
         turtle.dropDown();
     end
+    local failedTries = 0;
     while turtle.getFuelLevel() < minimumRequiredFuel do
         os.sleep(5);
         turtle.suckDown();
-        turtle.refuel();
+        if turtle.getItemCount() > 0 and not turtle.refuel() then
+            failedTries = failedTries + 1;
+            turtle.dropDown();
+        end
+        if failedTries > 5 then
+            -- give up
+            return false;
+        end
+    end
+    return true;
+end
+
+
+local function EnsureMinimumFuelRequirementMet(minFuel)
+    if turtle.getFuelLimit() < minFuel then
+        return false;
+    end
+
+    if turtle.getFuelLevel() >= minFuel * 2 then
+        return true;
+    end
+
+    return GetFuelInChunkOrAdjacent(minFuel);
+end
+
+local function EmptyInventoryIntoClosestChunk()
+    local chunkX, chunkZ = GetClosestConnectedChunk();
+    NavigateToChunkChest(chunkX, chunkZ);
+    for i = 1, 16 do
+        turtle.dropDown();
     end
 end
 
@@ -87,4 +121,6 @@ return {
     NavigateToChunkChest=NavigateToChunkChest,
     GetChunkStatusFromServer = GetChunkStatusFromServer,
     SetChunkStatusOnServer = SetChunkStatusOnServer,
-    GetChunkFromPosition=GetChunkFromPosition}
+    GetChunkFromPosition=GetChunkFromPosition,
+    EnsureMinimumFuelRequirementMet = EnsureMinimumFuelRequirementMet,
+    EmptyInventoryIntoClosestChunk = EmptyInventoryIntoClosestChunk}

@@ -1,5 +1,7 @@
-local deployJob = require("jobs.deployServiceGrid");
 local generatorTools = require("lib.generatorTools");
+local turtleMesh = require("lib.turtleMesh");
+local constants = require("lib.turtleMeshConstants");
+local positionProvider = require("lib.positionProvider")
 
 local isJobActive = false;
 local serverId = nil;
@@ -78,9 +80,11 @@ local function RunJob(job)
     end
     LogInfo("end job command list");
     updateTimeRemaing(GetCommandCost(jobCommands));
+
     -- ensure sufficient fuel to complete the operation and/or has available fuel source
-    if turtle.getFuelLevel() < remainingTime * 2 then
-        print("insufficient fuel to complete operation. need at least " .. tostring(remainingTime * 2));
+    local requiredFuel = remainingTime * 2;
+    if not turtleMesh.EnsureMinimumFuelRequirementMet(requiredFuel) then
+        print("insufficient fuel to complete operation. need at least " .. tostring(requiredFuel));
         return false;
     end
     ExecuteCommands(jobCommands, updateTimeRemaing);

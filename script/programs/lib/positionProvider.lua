@@ -272,6 +272,14 @@ local function NavigateToPositionAsCommand(estimatedStartPos, endPos, optionalTr
     });
 end
 
+local function MoveToHoldingLocation()
+    local targetY = constants.NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
+    math.randomseed(os.getComputerID());
+    local targetX = math.random(0, 15) + math.floor(currentPosition/16) * 16;
+    local targetZ = math.random(0, 15) + math.floor(currentPosition/16) * 16;
+    NavigateToPositionSafe(vector.new(targetX, targetY, targetZ), targetY);
+end
+
 
 return {
     up=MoveUp,
@@ -287,5 +295,6 @@ return {
     NavigateToPositionSafe = NavigateToPositionSafe,
     NavigateToPositionAsCommand = NavigateToPositionAsCommand,
     PointInDirection = PointInDirection,
-    EstimateMoveTimeCost = EstimateMoveTimeCost
+    EstimateMoveTimeCost = EstimateMoveTimeCost,
+    MoveToHoldingLocation=MoveToHoldingLocation
 }

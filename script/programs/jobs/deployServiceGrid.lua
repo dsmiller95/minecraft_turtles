@@ -123,6 +123,21 @@ local function WaitForModemActivate()
         cost = 1,
         description = "wait for modem to activate"
     });
+    coroutine.yield({
+        ex = function ()
+            -- should be right below me, 0 cost
+            mesh.EmptyInventoryIntoClosestChunk();
+        end,
+        cost = 1,
+        description = "empty extra items into chest"
+    });
+    coroutine.yield({
+        ex = function ()
+            position.MoveToHoldingLocation();
+        end,
+        cost = 16,
+        description = "move to a holding location"
+    });
 end
 
 local function GenerateCommands()
