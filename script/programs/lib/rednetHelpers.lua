@@ -7,4 +7,12 @@ local function ListenFor(protocall, responseHandler)
     end
 end
 
-return {ListenFor=ListenFor}
+local function EnsureModemOpen()
+    if rednet.isOpen() then
+        return;
+    end
+    local modemName = peripheral.getName(peripheral.find("modem"));
+    rednet.open(modemName);
+end
+
+return {ListenFor=ListenFor, EnsureModemOpen=EnsureModemOpen, EnsureModemClosed=EnsureModemClosed}
