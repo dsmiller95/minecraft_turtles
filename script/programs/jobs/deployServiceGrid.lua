@@ -154,7 +154,7 @@ local function ExecuteCommands(allCommands)
     while table.maxn(allCommands) >= 1 do
         local command = allCommands[1];
         command.ex();
-        table.remove(allCommands, 0);
+        table.remove(allCommands, 1);
         commandTimeRemaining = GetTotalCommandCost(allCommands);
         updateRemainingTimeCallback();
     end
