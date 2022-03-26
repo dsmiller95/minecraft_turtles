@@ -27,6 +27,12 @@ local function GetChunkStatusFromServer(x, z)
     local id, msg = rednet.receive("CHUNKRESP");
     return msg;
 end
+local function SetChunkStatusOnServer(x, z, status)
+    local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
+    rednet.send(chunkServer, "update (" .. tostring(x) .. ", " .. tostring(z) .. ") : {" .. status .. "}");
+    local id, msg = rednet.receive("CHUNKRESP");
+    return msg;
+end
 
 local adjacents = {
     { 1, 0},
@@ -68,4 +74,5 @@ return {
     GetFuelInChunkOrAdjacent=GetFuelInChunkOrAdjacent,
     NavigateToChunkChest=NavigateToChunkChest,
     GetChunkStatusFromServer = GetChunkStatusFromServer,
+    SetChunkStatusOnServer = SetChunkStatusOnServer,
     GetChunkFromPosition=GetChunkFromPosition}
