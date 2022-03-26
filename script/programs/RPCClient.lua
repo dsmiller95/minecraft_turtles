@@ -1,4 +1,4 @@
-local rednetHelpers    = require  ("lib.rednetHelpers ");
+local rednetHelpers    = require  ("lib.rednetHelpers");
 
 local function PeriodicAnnounce()
      while true do

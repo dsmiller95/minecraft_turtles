@@ -1,4 +1,4 @@
-local jobLib = require  ("lib.jobClientLibrary  ");
+local jobLib = require("lib.jobClientLibrary");
 
 local jobCommand = table.concat(arg, " ");
 

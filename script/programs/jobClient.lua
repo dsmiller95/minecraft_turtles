@@ -1,4 +1,4 @@
-local jobLib = require  ("lib.jobClientLibrary  ");
+local jobLib = require  ("lib.jobClientLibrary");
 
 local modemName = peripheral.getName(peripheral.find("modem"));
 rednet.open(modemName);
