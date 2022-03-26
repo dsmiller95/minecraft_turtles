@@ -83,9 +83,7 @@ local function RespondToDataRequest(senderId, message)
 end
 
 
-local modemName = peripheral.getName(peripheral.find("modem"));
-rednet.open(modemName);
-
+rednetHelpers.EnsureModemOpen();
 rednet.host("CHUNKREQ", "chunkServer");
 parallel.waitForAll(
     rednetHelpers.ListenFor("CHUNKREQ", RespondToDataRequest),

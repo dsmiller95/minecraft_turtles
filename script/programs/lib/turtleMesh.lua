@@ -1,5 +1,6 @@
 local position = require("lib.positionProvider");
 local constants = require("lib.turtleMeshConstants");
+local rednetHelpers = require("lib.rednetHelpers");
 
 
 local function GetChunkFromPosition(vectorPos)
@@ -22,11 +23,10 @@ end
 
 
 local function GetChunkStatusFromServer(x, z)
+    rednetHelpers.EnsureModemOpen();
     local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
-    print("found chunk server" .. tostring(chunkServer));
     local req = "status (" .. tostring(x) .. ", " .. tostring(z) .. ")";
     rednet.send(chunkServer, req, "CHUNKREQ");
-    print("sent request " .. tostring(chunkServer) .. " : " .. req);
     local id, msg = rednet.receive("CHUNKRESP");
     if msg == "INVALID REQUEST" then
         error("invalid request sent to chunk server: " .. req)
@@ -34,10 +34,15 @@ local function GetChunkStatusFromServer(x, z)
     return tonumber(msg);
 end
 local function SetChunkStatusOnServer(x, z, status)
+    rednetHelpers.EnsureModemOpen();
     local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
-    local statusCode = tonumber (status);
-    rednet.send(chunkServer, "update (" .. tostring(x) .. ", " .. tostring(z) .. ") : {" .. tostring(statusCode) .. "}", "CHUNKREQ");
+    local statusCode = tonumber(status);
+    local req = "update (" .. tostring(x) .. ", " .. tostring(z) .. ") : {" .. tostring(statusCode) .. "}";
+    rednet.send(chunkServer, req, "CHUNKREQ");
     local id, msg = rednet.receive("CHUNKRESP");
+    if msg == "INVALID REQUEST" then
+        error("invalid request sent to chunk server: " .. req)
+    end
     return tonumber(msg);
 end
 

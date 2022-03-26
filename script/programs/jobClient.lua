@@ -1,8 +1,8 @@
 local jobLib = require  ("lib.jobClientLibrary");
+local rednetHelpers = require("lib.rednetHelpers")
 
-local modemName = peripheral.getName(peripheral.find("modem"));
-rednet.open(modemName);
 
+rednetHelpers.EnsureModemOpen();
 jobLib.InitLog();
 parallel.waitForAll(jobLib.PollForAndRunJobs, jobLib.EmitJobUpdates);
 jobLib.CloseLog();

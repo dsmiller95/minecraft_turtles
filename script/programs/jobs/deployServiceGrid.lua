@@ -5,6 +5,7 @@ local build = require("lib.buildingTools");
 local mesh = require("lib.turtleMesh");
 local constants = require("lib.turtleMeshConstants");
 local generatorTools = require("lib.generatorTools");
+local rednetHelpers  = require("lib.rednetHelpers")
 
 local CABLE_ITEM_SLOT = 1;
 local CHEST_ITEM_SLOT = 2;
@@ -116,6 +117,7 @@ local function WaitForModemActivate()
             print("waiting for active modem. press enter when modem activated....");
             read();
             print("modem activated confirmed. reporting grid chunk " .. targetChunkX .. ", " .. targetChunkZ .. " as fueled");
+            mesh.SetChunkStatusOnServer(targetChunkX, targetChunkZ, constants.CHUNK_STATUS.FUELED);
         end,
         cost = 1,
         description = "wait for modem to activate"
