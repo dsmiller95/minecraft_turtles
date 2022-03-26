@@ -5,14 +5,13 @@ return {
     MESH_LAYER_MIN = 11,
     MESH_LAYER_MAX = 14,
     INVENTORY_SLOTS = {
-        FUEL = 1,
-        NETWORK_CABLE = 2,
-        MODEM = 3,
-        CHEST = 4,
-        DUMP = 5,
-        DATA_SLOT_1 = 6,
-        DATA_SLOT_2 = 7,
-        MAX_RESERVED_ID=7
+        -- inventory up to 10 is reserved for fuel
+        -- data slot 1 and 2 are for flags
+        FUEL_MAX_SLOT = 10,
+        SUCC_PROTECTION_SLOT_BEGIN = 20,
+        SUCC_PROTECTION_SLOT_END = 25,
+        DATA_SLOT_1 = 26,
+        DATA_SLOT_2 = 27
     },
     CHUNK_STATUS = {
         WILDERNESS = 0,

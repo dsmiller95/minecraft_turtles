@@ -45,7 +45,7 @@ local function GetFuelInChunkOrAdjacent(minimumRequiredFuel)
             chunkX + adjacents[adjacentIndex][1],
             chunkX + adjacents[adjacentIndex][2])
     end
-    if status < constants.CHUNK_STATUS  .FUELED then
+    if status < constants.CHUNK_STATUS.FUELED then
         error("no adjacent chunk has fuel available");
     end
     chunkX = chunkX + adjacents[adjacentIndex][1];

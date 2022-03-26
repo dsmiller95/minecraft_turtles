@@ -44,7 +44,6 @@ local function GetCommandCost(commands)
     return commandCost
 end
 
-
 local function ExecuteCommands(commands, timeRemainingCallback)
     while table.maxn(commands) >= 1 do
         local command = commands[1];

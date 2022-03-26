@@ -16,6 +16,11 @@ local BulkStorageTypeByCount = {
     "minecraft:coal"
 }
 
+local ValidFuel = {
+    ["minecraft:coal"] = "minecraft:coal",
+    ["minecraft:charcoal"] = "minecraft:charcoal"
+}
+
 
 -- Meta class
 CompositeInventory = {inventories = nil, currentSlot = nil, activeInventoryIndex = nil, isSink = nil}
@@ -50,7 +55,7 @@ end
 function CompositeInventory:updateActiveSlot()
     while self.activeInventoryIndex <= table.maxn(self.inventories) do
         while self.currentSlot <= self:ActiveInventory().size() do
-            if self.currentSlot ~= constants.INVENTORY_SLOTS.DATA_SLOT_1 and self:IsCurrentSlotValid() then
+            if self:IsCurrentSlotValid() then
                 return;
             end
             self.currentSlot = self.currentSlot + 1;
@@ -107,6 +112,19 @@ function CompositeInventory:new(o, inventories, isSink)
    return inv;
 end
 
+function EnsureProtectionSlotsFilled(providerChest, protectionUnitInput)
+    if protectionUnitInput:isComplete() then
+        return;
+    end
+
+    local allSlots = providerChest.list();
+    for i = constants.INVENTORY_SLOTS.SUCC_PROTECTION_SLOT_BEGIN, constants.INVENTORY_SLOTS.SUCC_PROTECTION_SLOT_END do
+        if not allSlots[i] then
+            -- if nothing in the slot, put something there
+            protectionUnitInput:pushN(10, providerChest, i);
+        end
+    end
+end
 
 function EmptyExtraToComposite(providerChest, compositeOutput)
     if compositeOutput:isComplete() then
@@ -116,33 +134,32 @@ function EmptyExtraToComposite(providerChest, compositeOutput)
 
     local allSlots = providerChest.list();
 
-    for invSlot, data in pairs(providerChest.list()) do
-        if invSlot > constants.INVENTORY_SLOTS.MAX_RESERVED_ID and data.count > 0 then
+    for invSlot, data in pairs(allSlots) do
+        if invSlot <= constants.INVENTORY_SLOTS.FUEL_MAX_SLOT and data.count > 0 and not ValidFuel[data.name] then
+            -- non-fuel in a fuel slot
+            compositeOutput:pullN(data.count, providerChest, invSlot);
+            if compositeOutput:isComplete() then
+                return;
+            end
+        end
+        if invSlot > constants.INVENTORY_SLOTS.FUEL_MAX_SLOT and invSlot < constants.INVENTORY_SLOTS.SUCC_PROTECTION_SLOT_BEGIN and data.count > 0 then
+            -- something in a non-fuel non-data
             compositeOutput:pullN(data.count, providerChest, invSlot);
             if compositeOutput:isComplete() then
                 return;
             end
         end
     end
-
-    -- for i = constants.INVENTORY_SLOTS.MAX_RESERVED_ID + 1, providerChest.size(), 1 do
-    --     local count = GetItemCount(providerChest, i);
-    --     if count > 0 then
-    --         compositeOutput:pullN(count, providerChest, i);
-    --         if compositeOutput:isComplete() then
-    --             return;
-    --         end
-    --     end
-    -- end
 end
 
 function FillFuelSlot(providerChest, fuelSource)
     if fuelSource:isComplete() then
         return;
     end
-    local currentCount = GetItemCount(providerChest, constants.INVENTORY_SLOTS.FUEL);
-    local maxCount = providerChest.getItemLimit(constants.INVENTORY_SLOTS.FUEL);
-    fuelSource:pushN(maxCount - currentCount, providerChest, constants.INVENTORY_SLOTS.FUEL);
+    local targetInvSlot = 1;
+    local currentCount = GetItemCount(providerChest, targetInvSlot);
+    local maxCount = providerChest.getItemLimit(targetInvSlot);
+    fuelSource:pushN(maxCount - currentCount, providerChest, targetInvSlot);
 end
 
 
@@ -171,11 +188,11 @@ function DistributeInventory()
             if not data1 then
                 table.insert(outputNodes, inventory)
             elseif data1.count == 2 then
-                local data2 = GetItemCount(inventory, constants .INVENTORY_SLOTS.DATA_SLOT_2);
+                local data2 = GetItemCount(inventory, constants.INVENTORY_SLOTS.DATA_SLOT_2);
                 if data2 == 13 then
                     table.insert(providerNodes, inventory)
                 else
-                    table.insert    (outputNodes, inventory);
+                    table.insert(outputNodes, inventory);
                 end
             else
                 table.insert(outputNodes, inventory);
@@ -207,11 +224,11 @@ function DistributeInventory()
     for _, provider in pairs(providerNodes) do
         EmptyExtraToComposite(provider, compositeOutput);
         FillFuelSlot(provider, fuelSource);
+        EnsureProtectionSlotsFilled(provider, cobbleSource);
     end
 end
 
 while true do
-    
     DistributeInventory ();
     os.sleep(1);
 end
