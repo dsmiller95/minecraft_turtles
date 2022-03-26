@@ -57,12 +57,13 @@ local function GetClosestConnectedChunk()
     local status = GetChunkStatusFromServer(chunkX, chunkZ);
 
     local adjacentIndex = 1;
-    while status < constants.CHUNK_STATUS.FUELED do
+    while status < constants.CHUNK_STATUS.FUELED and adjacentIndex <= 4 do
          status = GetChunkStatusFromServer(
             chunkX + adjacents[adjacentIndex][1],
             chunkX + adjacents[adjacentIndex][2])
+        adjacentIndex = adjacentIndex + 1;
     end
-    if status < constants.CHUNK_STATUS.FUELED then
+    if status < constants.CHUNK_STATUS.FUELED or adjacentIndex > 4 then
         return nil;
     end
 
