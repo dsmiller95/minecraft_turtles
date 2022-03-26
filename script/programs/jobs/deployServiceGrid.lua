@@ -137,12 +137,25 @@ local function GenerateCablePlaceCommands()
     });
 end
 
+local function WaitForModemActivate()
+    coroutine.yield({
+        ex = function ()
+            LogInfo("waiting for active modem. press enter when modem activated....");
+            read();
+            LogInfo("modem activated confirmed. reporting grid chunk " .. targetChunkX .. ", " .. targetChunkZ .. " as fueled");
+        end,
+        cost = 1,
+        description = "wait for modem to activate"
+    });
+end
+
 local function GenerateCommands()
     LogInfo("getting chunk commands");
     GenerateMoveChunkCommands();
     LogInfo("getting placement commands");
     GenerateCablePlaceCommands();
     LogInfo("done");
+    WaitForModemActivate();
 end
 local function GetAllCommandsList()
     return generatorTools.GetListFromGeneratorFunction(function() GenerateCommands() end);
@@ -183,12 +196,6 @@ local function Execute(chunkX, chunkZ)
     updateRemainingTimeCallback();
 
     ExecuteCommands(allCommands);
-
-    local msg ="waiting for active modem. press enter when modem activated...."; 
-    LogInfo(msg);
-    read();
-    msg = "modem activated confirmed. reporting grid chunk " .. targetChunkX .. ", " .. targetChunkZ .. " as fueled";
-    LogInfo(msg);
 
     CloseLog();
 end
