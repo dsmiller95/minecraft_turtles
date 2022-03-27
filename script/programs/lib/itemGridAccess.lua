@@ -76,6 +76,7 @@ local function GetAllItemsToSlotsAsCommands(itemRequests, initalPosition)
             description = "aquiring " .. itemRequest.type,
         });
     end
+    return initalPosition;
 end
 
 return {

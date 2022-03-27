@@ -5,6 +5,7 @@ local mesh = require("lib.turtleMesh");
 local constants = require("lib.turtleMeshConstants");
 local rednetHelpers  = require("lib.rednetHelpers")
 local inventoryTools = require("lib.inventoryTools");
+local itemGridAccess = require("lib.itemGridAccess");
 
 local CABLE_ITEM_SLOT = inventoryTools.GetItemHandle("computercraft:cable");
 local CHEST_ITEM_SLOT = inventoryTools.GetItemHandle("minecraft:chest");
@@ -16,11 +17,10 @@ local targetChunkX, targetChunkZ = nil, nil;
 local function GetTargetInChunk()
     return vector.new(targetChunkX * 16, constants.MESH_LAYER_MIN, targetChunkZ * 16);
 end
-local function GenerateMoveChunkCommands()
-    local initial = position.Position();
+local function GenerateMoveChunkCommands(initialPosition)
     local target = GetTargetInChunk();
     
-    position.NavigateToPositionAsCommand(initial, target);
+    position.NavigateToPositionAsCommand(initialPosition, target);
 end
     -- excavate layers at some height. perhaps bottom of the map.
 local excavateTimeRemaining = 0;
@@ -147,8 +147,15 @@ local function WaitForModemActivate()
 end
 
 local function GenerateCommands()
+    print("getting item commands");
+    local itemNeeds = {
+        {type="computercraft:cable", count=31},
+        {type="minecraft:chest", count=1},
+        {type="computercraft:wired_modem_full", count=1},
+    };
+    local nextPosition = itemGridAccess.GetAllItemsToSlotsAsCommands(itemNeeds);
     print("getting chunk commands");
-    GenerateMoveChunkCommands();
+    GenerateMoveChunkCommands(nextPosition);
     print("getting placement commands");
     GenerateCablePlaceCommands();
     print("done");
