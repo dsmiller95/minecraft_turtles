@@ -35,7 +35,7 @@ local function DeposItemsIfNeeded()
     });
 end
 
-local function DigCell(initialPos, targetPos, width, height, cellX, cellY)
+local function DigCell(initialPos, targetPos, width, height)
     position.NavigateToPositionAsCommand(initialPos, targetPos, targetPos.y);
     coroutine.yield({
         ex = function ()
@@ -44,7 +44,7 @@ local function DigCell(initialPos, targetPos, width, height, cellX, cellY)
             position.downWithDig();
         end,
         cost = width * height + width,
-        description = "excavate base chunk layer depth 3",
+        description = "excavate "..width.."x"..height.."x3",
     });
     DeposItemsIfNeeded();
     return targetPos;
@@ -54,14 +54,14 @@ local function ExcavateUpToBottomOfMesh()
     local defaultDigDirection = vector.new(1, 0, 0);
     local baseLayersToDig = constants.MESH_LAYER_MIN - constants.QUARRY_MIN;
     local fullLayersToDig = math.floor(baseLayersToDig / 3);
-    for i = 1, fullLayersToDig do
+    for i = 0, fullLayersToDig - 1 do
         local target = GetTargetInChunk();
-        target.y = target.y + fullLayersToDig * 3;
+        target.y = target.y + i * 3;
         local initial = target;
         initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8)
         initial = DigCell(initial, target + vector.new(8, 0, 0), 8, 8)
-        initial = DigCell(initial, target + vector.new(8, 8, 0), 8, 8)
-        initial = DigCell(initial, target + vector.new(0, 8, 0), 8, 8)
+        initial = DigCell(initial, target + vector.new(8, 0, 8), 8, 8)
+        initial = DigCell(initial, target + vector.new(0, 0, 8), 8, 8)
     end
     local extraLayers = baseLayersToDig % 3;
     if extraLayers == 1 then
