@@ -69,6 +69,7 @@ end
 local function FocusCenterScreenPos(monitor)
     local centerX, centerZ = CenterOfScreen()
     monitor.setCursorPos(centerX, centerZ);
+    monitor.setCursorBlink(true);
 end
 
 local function InitializeChunkTable(monitor)
@@ -151,7 +152,7 @@ local function GetCableState()
         newState.right = rs.getInput("right");
         newState.up = rs.getInput("back");
         newState.down = rs.getInput("front");
-        newState.activate = rs.getInput("up");
+        newState.activate = rs.getInput("top");
         return newState; 
     else
         return redstoneTools.ReadLabeledCableState(labeledCableStates, redstoneSide);
