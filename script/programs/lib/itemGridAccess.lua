@@ -10,7 +10,8 @@ local function GetItemPositionFromServer(itemName)
     rednet.send(itemServer, req, "ITEMREQ");
     local id, msg = rednet.receive("ITEMRESP");
     if msg == "INVALID REQUEST" then
-        error("invalid request sent to item server: " .. req)
+        print("error: invalid request sent to item server: " .. req);
+        return false;
     end
     local item = textutils.unserialize(msg);
     if not item then
@@ -38,7 +39,8 @@ local function GetAllItemsToSlotsAsCommands(itemRequests, initalPosition)
     for _, itemRequest in pairs(itemRequests) do
         local itemPosition = GetItemPositionFromServer(itemRequest.type);
         if not itemPosition then
-            error("could not find item " .. itemRequest.type);
+            print("error: could not find item " .. itemRequest.type)
+            return false;
         end
         local targetPosition = itemPosition + vector.new(0, 0, -2);
         positionProvider.NavigateToPositionAsCommand(initalPosition, targetPosition);
