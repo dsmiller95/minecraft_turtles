@@ -27,6 +27,10 @@ local function ValidatePredictedPosition()
     end
 end
 
+local function CurrentDirectionVector()
+    return directionToDiff[currentDirection];
+end
+
 local function UnitVectorToDirection(unitVector)
     for i = 0, 3 do
         local directionVect = directionToDiff[i + 1];
@@ -196,12 +200,22 @@ local function EstimateMoveTimeCost(startPos, endPos)
         + math.abs(startPos.z - endPos.z)
 end
 
+local function DetermineDirectionality()
+    if currentDirection then
+        return true;
+    end
+    if MoveForward() then
+        return true;
+    end
+    if MoveBack() then
+        return true;
+    end
+    MoveForwardDigIfNeeded();
+end
+
 local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride)
-    if not currentDirection then
-        -- move around to get the direction
-        if not MoveForward() and not MoveBack() then
-            MoveForwardDigIfNeeded();
-        end
+    if not DetermineDirectionality() then
+        error("could not determine direction");
     end
     -- navigate away from reserved coords in chunks
     if currentPosition.x % 16 == 8 then
@@ -298,5 +312,7 @@ return {
     NavigateToPositionAsCommand = NavigateToPositionAsCommand,
     PointInDirection = PointInDirection,
     EstimateMoveTimeCost = EstimateMoveTimeCost,
-    MoveToHoldingLocation=MoveToHoldingLocation
+    MoveToHoldingLocation=MoveToHoldingLocation,
+    DetermineDirectionality=DetermineDirectionality,
+    CurrentDirectionVector=CurrentDirectionVector
 }

@@ -33,7 +33,7 @@ local function GetItemProvider(senderId, message)
 end
 
 local function SetItemProvider(senderId, message)
-    local s, e, itemName, x, y, z = string.find(message, "provideItem {(.*)} %((-?%d+), (-?%d+), (-?%d+)%)");
+    local s, e, itemName, x, y, z = string.find(message, "provideItem {(.*)} %((-?%d+), ?(-?%d+), ?(-?%d+)%)");
     local newItem = {
         name = itemName ,
         pos = {
