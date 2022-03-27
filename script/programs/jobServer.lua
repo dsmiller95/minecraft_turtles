@@ -131,6 +131,46 @@ local function QueueJobs()
     end
 end
 
+local oldColor = colors.red;
+local oldTime = 1 * 60 * 1000;
+local warningColor = colors.orange;
+local warningTime = 1 * 30 * 1000;
+local newColor = colors.green;
+local newTime = 1 * 10 * 1000;
+
+
+local function WriteJobsToMonitor()
+    while true do
+        local monitor = peripheral.find("monitor");
+        if not monitor then
+            print("connect a monitor to list all jobs");
+            os.sleep(30);
+            return;
+        end
+        monitor.setTextScale(0.5);
+        local updateTime = os.epoch("utc");
+        for i, job in ipairs(allJobs) do
+            monitor.setCursorPos(1, i);
+            local claimEpoch = job.lastUpdateFromClaimant or 0;
+            local diff = updateTime - claimEpoch;
+            local timeColor = oldColor  ;
+            if diff < newTime then
+                timeColor = newColor
+            elseif diff < warningTime then
+                timeColor = warningColor;
+            end
+            local claimTime = os.date(nil, (claimEpoch) / 1000);
+            monitor.setBackgroundColor(colors.black);
+            monitor.write((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command .. ":");
+            monitor.setBackgroundColor(timeColor);
+            monitor.write(claimTime);
+            monitor.setBackgroundColor(colors.black);
+            monitor.write(":" .. tostring(job.estimatedRemainingTime or 0));
+        end
+        os.sleep(1);
+    end
+end
+
 local modemName = peripheral.getName(peripheral.find("modem"));
 rednet.open(modemName);
-parallel.waitForAll(PeriodicAnnounce, ServeJobs, QueueJobs)
+parallel.waitForAll(PeriodicAnnounce, ServeJobs, QueueJobs, WriteJobsToMonitor)
