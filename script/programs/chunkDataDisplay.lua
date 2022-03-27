@@ -26,7 +26,7 @@ local chunkTable = {}
 local function InitializeChunkTable(monitor)
     local width, height = monitor.getSize();
     chunkTable = {};
-    for y = 1, height do
+    for z = 1, height do
         local newTable = {};
         for x = 1, width do
             local status = consts.CHUNK_STATUS.WILDERNESS;
@@ -35,7 +35,7 @@ local function InitializeChunkTable(monitor)
             end
             local newChunk = {
                 x = centerChunk.x + x,
-                y = centerChunk.y + y,
+                z = centerChunk.z + z,
                 status = status
             };
             table.insert(newTable, newChunk);
@@ -45,10 +45,10 @@ local function InitializeChunkTable(monitor)
 end
 
 local function DrawChunkStates(monitor)
-    for y = 1, table.maxn(chunkTable) do
-        monitor.setCursorPos(1, y);
-        for x = 1, table.maxn(chunkTable[y]) do
-            local chunk = chunkTable[y][x];
+    for z = 1, table.maxn(chunkTable) do
+        monitor.setCursorPos(1, z);
+        for x = 1, table.maxn(chunkTable[z]) do
+            local chunk = chunkTable[z][x];
             local color = colorsByChunkStats[chunk.status];
             monitor.setBackgroundColor(color);
             monitor.write(tostring(chunk.status));
