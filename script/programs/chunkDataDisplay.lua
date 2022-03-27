@@ -1,5 +1,6 @@
 
 local redstoneTools = require("lib.redstoneTools");
+local consts = require("lib.turtleMeshConstants");
 
 local labeledCableStates = {
     ["left"]=11, -- blue
@@ -8,6 +9,55 @@ local labeledCableStates = {
     ["down"]=4, -- yellow
 }
 
+local centerChunk = {
+    x = 20,
+    z = -20
+};
+
+local colorsByChunkStats = {
+    [consts.CHUNK_STATUS.WILDERNESS] = colors.black;
+    [consts.CHUNK_STATUS.FUELED] = colors.brown;
+    [consts.CHUNK_STATUS.MESH_QUARRIED] = colors.blue;
+    [consts.CHUNK_STATUS.COMPLETELY_MINED] = colors.white;
+}
+
+local chunkTable = {}
+
+local function InitializeChunkTable(monitor)
+    local width, height = monitor.getSize();
+    chunkTable = {};
+    for y = 1, height do
+        local newTable = {};
+        for x = 1, width do
+            local status = consts.CHUNK_STATUS.WILDERNESS;
+            if math.random() > 0.5 then
+                status = consts.CHUNK_STATUS.FUELED;
+            end
+            local newChunk = {
+                x = centerChunk.x + x,
+                y = centerChunk.y + y,
+                status = status
+            };
+            table.insert(newTable, newChunk);
+        end
+        table.insert(chunkTable, table);
+    end
+end
+
+local function DrawChunkStates(monitor)
+    for y = 1, table.maxn(chunkTable) do
+        monitor.setCursorPos(1, y);
+        for x = 1, table.maxn(chunkTable[y]) do
+            local chunk = chunkTable[y][x];
+            local color = colorsByChunkStats[chunk.status];
+            monitor.setBackgroundColor(color);
+            monitor.write(tostring(chunk.status));
+        end
+    end
+end
+
+
+
 local lastCableState = {
     ["left"]=false,
     ["right"]=false,
@@ -15,10 +65,13 @@ local lastCableState = {
     ["down"]=false,
 }
 
+local monitor = peripheral.find("monitor");
 local function HandleDirectionButtonPress(directionButton)
     print(directionButton);
+    DrawChunkStates(monitor);
 end
 
+InitializeChunkTable(monitor);
 while true do
     local nextStates = redstoneTools.ReadLabeledCableState(labeledCableStates, "left");
     for name, value in pairs(nextStates) do
