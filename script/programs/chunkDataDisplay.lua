@@ -1,6 +1,7 @@
 
 local redstoneTools = require("lib.redstoneTools");
 local consts = require("lib.turtleMeshConstants");
+local mesh = require("lib.turtleMesh");
 
 local labeledCableStates = {
     ["left"]=11, -- blue
@@ -59,20 +60,24 @@ local function InitializeChunkTable(monitor)
     end
 end
 
+local function DrawSingleChunk(monitor, x, z)
+    monitor.setCursorPos(x, z);
+    local chunk = GetChunkData(x + centerChunk.x, z + centerChunk.z);
+    local status;
+    if not chunk then
+        status = consts.CHUNK_STATUS.WILDERNESS;
+    else
+        status = chunk.status;
+    end
+    local color = colorsByChunkStats[status];
+    monitor.setBackgroundColor(color);
+    monitor.write(tostring(status));
+end
+
 local function DrawChunkStates(monitor)
     for z = 1, chunkHeight do
-        monitor.setCursorPos(1, z);
         for x = 1, chunkWidth do
-            local chunk = GetChunkData(x + centerChunk.x, z + centerChunk.z);
-            local status;
-            if not chunk then
-                status = consts.CHUNK_STATUS.WILDERNESS;
-            else
-                status = chunk.status;
-            end
-            local color = colorsByChunkStats[status];
-            monitor.setBackgroundColor(color);
-            monitor.write(tostring(status));
+            DrawSingleChunk(monitor, x, z);
         end
     end
 end
@@ -88,16 +93,16 @@ local function HandleDirectionButtonPress(directionButton)
     print(directionButton);
     local moveDir = nil;
     if directionButton == "left" then
-        moveDir = {x=-1, z=0};
-    elseif directionButton=="right" then
         moveDir = {x=1, z=0};
+    elseif directionButton=="right" then
+        moveDir = {x=-1, z=0};
     elseif directionButton=="up" then
         moveDir = {x=0, z=1};
     elseif directionButton=="down" then
         moveDir = {x=0, z=-1};
     end
     centerChunk.x = centerChunk.x + moveDir.x;
-    centerChunk.y = centerChunk.y + moveDir.y;
+    centerChunk.z = centerChunk.z + moveDir.z;
     DrawChunkStates(monitor);
 end
 
@@ -117,9 +122,48 @@ local function WatchForRedstoneChangeEvents()
     end
 end
 
+local adj = {
+    {x=1, z=0},
+    {x=-1, z=0},
+    {x=0, z=1},
+    {x=0, z=-1},
+}
+local function ShouldUpdateChunk(x, z)
+    local chunk = GetChunkData(x, z);
+    if chunk and chunk.status ~= consts.CHUNK_STATUS.WILDERNESS then
+        return true;
+    end
+    for _, a in pairs(adj) do
+        chunk = GetChunkData(x + a.x, z + a.z);
+        if chunk and chunk.status ~= consts.CHUNK_STATUS.WILDERNESS then
+            return true;
+        end
+    end
+    return false;
+end
+
+local function UpdateChunksAndAdjacentChunks()
+    for z = 1, chunkHeight do
+        for x = 1, chunkWidth do
+            local chunkX, chunkZ = x + centerChunk.x, z + centerChunk.z
+            if ShouldUpdateChunk(chunkX, chunkZ) then
+                local newStatus = mesh.GetChunkStatusFromServer(chunkX, chunkZ);
+                local newChunk = {
+                    x = chunkX,
+                    z = chunkZ,
+                    status = newStatus
+                };
+                WriteChunkData(newChunk);
+                DrawSingleChunk(monitor, x, z);
+            end
+        end
+    end
+end
+
 local function UpdateAllChunksPeriodically()
     while true do
-        
+        UpdateChunksAndAdjacentChunks();
+        os.sleep(10);
     end
 end
 
