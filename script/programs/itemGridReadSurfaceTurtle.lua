@@ -9,7 +9,7 @@ local width = arg[2];
 local function DetermineType()
     turtle.select(16);
     if turtle.getItemCount() > 0 then
-        error("should be empty");
+        turtle.dropDown();
     end
     turtle.suck();
     if turtle.getItemCount() < 0 then
