@@ -58,7 +58,7 @@ local function UpdateJob(claimantId, msg)
         job.estimatedRemainingTime = tonumber(timeData); 
     end
     if job.status == "COMPLETE" then
-        print("job completed");
+        --print("job completed");
         table.remove(allJobs, jobIndex);
         return;
     end
