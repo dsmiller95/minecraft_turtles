@@ -21,7 +21,7 @@ end
 
 local centerChunk = {
     x = chunkX,
-    z = -chunkZ
+    z = chunkZ
 };
 
 
