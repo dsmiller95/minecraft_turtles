@@ -132,13 +132,13 @@ local function HandleDirectionButtonPress(directionButton)
     print(directionButton);
     local moveDir = nil;
     if directionButton == "left" then
-        moveDir = {x=1, z=0};
-    elseif directionButton=="right" then
         moveDir = {x=-1, z=0};
+    elseif directionButton=="right" then
+        moveDir = {x=1, z=0};
     elseif directionButton=="up" then
-        moveDir = {x=0, z=1};
-    elseif directionButton=="down" then
         moveDir = {x=0, z=-1};
+    elseif directionButton=="down" then
+        moveDir = {x=0, z=1};
     end
     centerChunk.x = centerChunk.x + moveDir.x;
     centerChunk.z = centerChunk.z + moveDir.z;
