@@ -9,10 +9,14 @@ local function GetChunkFromPosition(vectorPos)
     return x, z;
 end
 
-local function NavigateToChunkChest(chunkX, chunkZ)
+local function GetTargetChunkChestPosition(chunkX, chunkZ)
     local x = chunkX * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.x;
     local z = chunkZ * 16 + constants.FUEL_CHEST_COORDS_IN_CHUNK.z;
-    local targetPosition = vector.new(x, constants.FUEL_CHEST_COORDS_IN_CHUNK.y + 1, z);
+    return vector.new(x, constants.FUEL_CHEST_COORDS_IN_CHUNK.y + 1, z);
+end
+
+local function NavigateToChunkChest(chunkX, chunkZ)
+    local targetPosition = GetTargetChunkChestPosition(chunkX, chunkZ);
     position.NavigateToPositionSafe(targetPosition);
 end
 
@@ -135,4 +139,5 @@ return {
     GetChunkFromPosition=GetChunkFromPosition,
     EnsureMinimumFuelRequirementMet = EnsureMinimumFuelRequirementMet,
     EmptyInventoryIntoClosestChunk = EmptyInventoryIntoClosestChunk,
-    GetClosestConnectedChunk = GetClosestConnectedChunk}
+    GetClosestConnectedChunk = GetClosestConnectedChunk,
+    GetTargetChunkChestPosition = GetTargetChunkChestPosition}

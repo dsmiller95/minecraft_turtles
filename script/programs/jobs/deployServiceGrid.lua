@@ -125,10 +125,13 @@ local function WaitForModemActivate()
     });
     coroutine.yield({
         ex = function ()
-            -- should be right below me, 0 cost
-            mesh.EmptyInventoryIntoClosestChunk();
+            -- should be right below me, 0 movement cost
+            for i = 1, 16 do
+                turtle.select(i);
+                turtle.dropDown();
+            end
         end,
-        cost = 1,
+        cost = 10,
         description = "empty extra items into chest"
     });
     coroutine.yield({
