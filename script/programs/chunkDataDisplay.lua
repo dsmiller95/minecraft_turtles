@@ -10,10 +10,21 @@ local labeledCableStates = {
     ["down"]=4, -- yellow
 }
 
+local redstoneSide = arg[1];
+local chunkX = arg[2];
+local chunkZ = arg[3];
+
+if not redstoneSide or not chunkX or not chunkZ then
+    print("usage: 'chunkDataDisplay <redstone side> <chunk x> <chunk z>'");
+    return;
+end
+
 local centerChunk = {
-    x = 20,
-    z = -20
+    x = chunkX,
+    z = -chunkZ
 };
+
+
 local chunkTable = {}
 local chunkWidth, chunkHeight;
 
@@ -40,19 +51,23 @@ local colorsByChunkStats = {
     [consts.CHUNK_STATUS.COMPLETELY_MINED] = colors.white;
 }
 
+local function ScreenPosToChunk(x, z)
+    
+    local halfHeight, halfWidth = math.floor(chunkHeight/2), math.floor(chunkWidth/2);
+    return x - halfWidth, z - halfHeight;
+
+end
 
 local function InitializeChunkTable(monitor)
     chunkWidth, chunkHeight = monitor.getSize();
     chunkTable = {};
+    local halfHeight, halfWidth = math.floor(chunkHeight/2), math.floor(chunkWidth/2);
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
-            local status = consts.CHUNK_STATUS.WILDERNESS;
-            if math.random() > 0.5 then
-                status = consts.CHUNK_STATUS.FUELED;
-            end
+            local status = consts.CHUNK_STATUS.FUELED;
             local newChunk = {
-                x = centerChunk.x + x,
-                z = centerChunk.z + z,
+                x = centerChunk.x + x - halfHeight,
+                z = centerChunk.z + z - halfWidth,
                 status = status
             };
             WriteChunkData(newChunk);
@@ -62,7 +77,7 @@ end
 
 local function DrawSingleChunk(monitor, x, z)
     monitor.setCursorPos(x, z);
-    local chunk = GetChunkData(x + centerChunk.x, z + centerChunk.z);
+    local chunk = GetChunkData(ScreenPosToChunk(x, z));
     local status;
     if not chunk then
         status = consts.CHUNK_STATUS.WILDERNESS;
@@ -107,7 +122,6 @@ local function HandleDirectionButtonPress(directionButton)
 end
 
 InitializeChunkTable(monitor);
-local redstoneSide = arg[1];
 
 local function WatchForRedstoneChangeEvents()
     while true do
@@ -145,7 +159,7 @@ end
 local function UpdateChunksAndAdjacentChunks()
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
-            local chunkX, chunkZ = x + centerChunk.x, z + centerChunk.z
+            local chunkX, chunkZ = ScreenPosToChunk(x, z);
             if ShouldUpdateChunk(chunkX, chunkZ) then
                 local newStatus = mesh.GetChunkStatusFromServer(chunkX, chunkZ);
                 local newChunk = {
