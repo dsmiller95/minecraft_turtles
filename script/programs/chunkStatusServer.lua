@@ -1,8 +1,6 @@
 local rednetHelpers    = require  ("lib.rednetHelpers");
 local constants = require("lib.turtleMeshConstants");
 
-local allChunks = {};
-
 local function ToChunkFileName(x, z)
     return tostring(x) .. "," .. tostring(z) .. ".chunk";
 end
@@ -50,17 +48,6 @@ local function WriteChunkData(x, z, chunk)
     file.close();
 end
 
-
-
--- Return the first index with the given value (or nil if not found).
-local function indexOf(array, matchFn)
-    for i, v in ipairs(array) do
-        if matchFn(v) then
-            return i
-        end
-    end
-    return nil
-end
 
 local function PeriodicAnnounce()
     while true do

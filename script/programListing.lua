@@ -2,7 +2,7 @@
 return {
     allPrograms = {
         "spiralTurtle", "straightTurtle", "mineToFloor", "patternPrint",
-        "manageGlobalInventory", "chunkStatusServer", 
+        "manageGlobalInventory", "chunkStatusServer", "itemGridServer",
         "RPCClient", "RPCServer",
         "jobClient", "jobServer", "runJob", "lib/jobClientLibrary",
         "lib/fuelingTools", "lib/buildingTools", "lib/inventoryTools", "lib/positionProvider", "lib/turtleMesh", "lib/turtleMeshConstants",
