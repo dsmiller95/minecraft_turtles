@@ -53,7 +53,7 @@ local colorsByChunkStats = {
 
 local function ScreenPosToChunk(x, z)
     
-    local halfHeight, halfWidth = math.floor(chunkHeight/2), math.floor(chunkWidth/2);
+    local halfWidth, halfHeight = math.floor(chunkWidth/2), math.floor(chunkHeight/2);
     return x - halfWidth, z - halfHeight;
 
 end
@@ -66,10 +66,9 @@ local function InitializeChunkTable(monitor)
         for x = 1, chunkWidth do
             local status = consts.CHUNK_STATUS.FUELED;
             local newChunk = {
-                x = centerChunk.x + x - halfHeight,
-                z = centerChunk.z + z - halfWidth,
                 status = status
             };
+            newChunk.x, newChunk.z = ScreenPosToChunk(x, z);
             WriteChunkData(newChunk);
         end
     end
@@ -121,7 +120,6 @@ local function HandleDirectionButtonPress(directionButton)
     DrawChunkStates(monitor);
 end
 
-InitializeChunkTable(monitor);
 
 local function WatchForRedstoneChangeEvents()
     while true do
@@ -180,6 +178,9 @@ local function UpdateAllChunksPeriodically()
         os.sleep(10);
     end
 end
+
+InitializeChunkTable(monitor);
+DrawChunkStates(monitor);
 
 parallel.waitForAny(
     WatchForRedstoneChangeEvents,
