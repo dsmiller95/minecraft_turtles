@@ -1,29 +1,20 @@
 
-function GetCommandsIterator(genFn)
-    local co = coroutine.create(genFn)
-    return function ()   -- iterator
-        local res = nil;
-        while res == nil do
-            local code, res = coroutine.resume(co)
-            print(code);
-            print(res);
-            if not code then
-                print("error when generating next value");
-                print(res);
-                return nil;
-            end
-            if res == nil then
-                os.sleep(1);
-                return "waiting";
-            end
-        end
-        return res
-    end
-end
 local function GetListFromGeneratorFunction(genFn)
     local list= {};
-    for item in GetCommandsIterator(genFn) do
-        table.insert(list, item);
+    local co = coroutine.create(genFn)
+    while coroutine.status(co) ~= "dead" do
+        local code, res = coroutine.resume(co)
+        print(code);
+        print(res);
+        if not code then
+            print("error when generating next value");
+            print(res);
+            return nil;
+        end
+        if res ~= nil then
+            table.insert(list, res);
+        end
+        coroutine.yield();
     end
     return list;
 end
