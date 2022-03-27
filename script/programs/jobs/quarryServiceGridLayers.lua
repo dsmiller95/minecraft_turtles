@@ -35,13 +35,11 @@ local function DeposItemsIfNeeded()
     });
 end
 
-local function DigCell(initialPos, targetPos, width, height)
-    position.NavigateToPositionAsCommand(initialPos, targetPos, targetPos.y, {nudge=false});
+local function DigCell(initialPos, targetPos, width, height, nudgeNavigate)
+    position.NavigateToPositionAsCommand(initialPos, targetPos, targetPos.y, {nudge=nudgeNavigate});
     coroutine.yield({
         ex = function ()
-            position.upWithDig();
             buildingTools.ExcavateLayer(width, height, true, true, vector.new(1, 0, 0));
-            position.downWithDig();
         end,
         cost = width * height + width,
         description = "excavate "..width.."x"..height.."x3 at " .. targetPos:tostring(),
@@ -56,7 +54,7 @@ local function ExcavateUpToBottomOfMesh()
     local fullLayersToDig = math.floor(baseLayersToDig / 3);
     for i = 0, fullLayersToDig - 1 do
         local target = GetTargetInChunk();
-        target.y = target.y + i * 3;
+        target.y = target.y + i * 3 + 1;
         local initial = target;
         initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8)
         initial = DigCell(initial, target + vector.new(8, 0, 0), 8, 8)
@@ -89,12 +87,12 @@ end
 
 local function ExcavateMeshGridExtraSpace()
     local target = GetTargetInChunk();
-    target.y = constants.MESH_LAYER_MIN;
+    target.y = constants.MESH_LAYER_MIN + 1;
     local initial = target;
-    initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8)
-    initial = DigCell(initial, target + vector.new(9, 0, 0), 8, 7)
-    initial = DigCell(initial, target + vector.new(9, 9, 0), 7, 7)
-    initial = DigCell(initial, target + vector.new(0, 9, 0), 7, 8)
+    initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8, true)
+    initial = DigCell(initial, target + vector.new(9, 0, 0), 8, 7, true)
+    initial = DigCell(initial, target + vector.new(9, 0, 9), 7, 7, true)
+    initial = DigCell(initial, target + vector.new(0, 0, 9), 7, 8, true)
 end
 
 local function WrapUp()
