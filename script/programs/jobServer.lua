@@ -9,10 +9,10 @@ function Job:new(command)
    local o = {};
    setmetatable(o, self);
    self.__index = self;
-   self.claimedComputerId = nil;
-   self.status = "UNCLAIMED";
-   self.lastUpdateFromClaimant = nil;
-   self.command = command;
+   o.claimedComputerId = nil;
+   o.status = "UNCLAIMED";
+   o.lastUpdateFromClaimant = nil;
+   o.command = command;
    return o;
 end
 
