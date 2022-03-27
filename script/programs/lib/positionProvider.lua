@@ -216,30 +216,8 @@ local function DetermineDirectionality()
     MoveBack();
 end
 
-local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride)
-    if not DetermineDirectionality() then
-        error("could not determine direction");
-    end
-    -- navigate away from reserved coords in chunks
-    if currentPosition.x % 16 == 8 then
-        if currentDirection % 2 == 0 then
-            TurnLeft()
-        end
-        MoveForwardDigIfNeeded();
-    end
-    if currentPosition.z % 16 == 8 then
-        if currentDirection % 2 == 1 then
-            TurnLeft();
-        end
-        MoveForwardDigIfNeeded();
-    end
-
-    -- move up or down into my navigation layer
-    local targetY = constants.NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
-    if optionalTransitHeightOverride then
-        targetY = optionalTransitHeightOverride;
-    end
-    MoveToAltitude(targetY);
+local function NavigateToPositionUnsafe(desiredPosition)
+    MoveToAltitude(desiredPosition.y);
 
     -- move in the x direction
     local desiredRotation = nil;
@@ -274,6 +252,42 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
             MoveForwardDigIfNeeded();
         end
     end
+end
+
+local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride)
+    if not DetermineDirectionality() then
+        error("could not determine direction");
+    end
+
+    -- navigate away from reserved coords in chunks
+    if currentPosition.x % 16 == 8 then
+        if currentDirection % 2 == 0 then
+            TurnLeft()
+        end
+        MoveForwardDigIfNeeded();
+    end
+    if currentPosition.z % 16 == 8 then
+        if currentDirection % 2 == 1 then
+            TurnLeft();
+        end
+        MoveForwardDigIfNeeded();
+    end
+
+    local distance = EstimateMoveTimeCost(currentPosition, desiredPosition);
+    local heightDiff = math.abs(currentPosition.y - desiredPosition.y);
+    if distance <= 1 or distance == heightDiff then
+        -- if we there already, or directly above, just go right there
+        NavigateToPositionUnsafe(desiredPosition);
+        return;
+    end
+
+    -- move up or down into my navigation layer
+    local targetY = constants.NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
+    if optionalTransitHeightOverride then
+        targetY = optionalTransitHeightOverride;
+    end
+    local iterimTarget = vector.new(desiredPosition.x, targetY, desiredPosition.z);
+    NavigateToPositionUnsafe(iterimTarget);
 
     MoveToAltitude(desiredPosition.y);
 end
