@@ -8,11 +8,15 @@ local labeledCableStates = {
     ["right"]=0, -- white
     ["up"]=3, -- light blue
     ["down"]=4, -- yellow
+    ["activate"]=5, -- ??? unused so far
 }
 
 local redstoneSide = arg[1];
 local chunkX = arg[2];
 local chunkZ = arg[3];
+
+local centerOffsetX = arg[4] or 0;
+local centerOffsetZ = arg[5] or 0;
 
 if not redstoneSide or not chunkX or not chunkZ then
     print("usage: 'chunkDataDisplay <redstone side> <chunk x> <chunk z>'");
@@ -50,13 +54,26 @@ local colorsByChunkStats = {
     [consts.CHUNK_STATUS.COMPLETELY_MINED] = colors.white;
 }
 
+local function CenterOfScreen()
+    local centerX, centerZ = math.floor(chunkWidth/2), math.floor(chunkHeight/2);
+    centerX = centerX + centerOffsetX;
+    centerZ = centerZ + centerOffsetZ;
+    return centerX, centerZ;
+end
+
 local function ScreenPosToChunk(x, z)
-    local halfWidth, halfHeight = math.floor(chunkWidth/2), math.floor(chunkHeight/2);
-    return x - halfWidth + centerChunk.x, z - halfHeight + centerChunk.z;
+    local centerX, centerZ = CenterOfScreen();
+    return x - centerX + centerChunk.x, z - centerZ + centerChunk.z;
+end
+
+local function FocusCenterScreenPos(monitor)
+    local centerX, centerZ = CenterOfScreen()
+    monitor.setCursorPos(centerX, centerZ);
 end
 
 local function InitializeChunkTable(monitor)
     chunkWidth, chunkHeight = monitor.getSize();
+    chunkHeight = chunkHeight - 1;
     chunkTable = {};
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
@@ -84,12 +101,20 @@ local function DrawSingleChunk(monitor, x, z)
     monitor.write(tostring(status));
 end
 
+local function DrawCenterPosition(monitor)
+    monitor.setCursorPos(1, chunkHeight + 1);
+    monitor.setBackgroundColor(colors.magenta);
+    monitor.write(tostring(centerChunk.x) .. "," .. tostring    (centerChunk.z));
+end
+
 local function DrawChunkStates(monitor)
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
             DrawSingleChunk(monitor, x, z);
         end
     end
+    DrawCenterPosition(monitor);
+    FocusCenterScreenPos(monitor);
 end
 
 local lastCableState = {
@@ -97,6 +122,7 @@ local lastCableState = {
     ["right"]=false,
     ["up"]=false,
     ["down"]=false,
+    ["activate"]=false,
 }
 
 local monitor = peripheral.find("monitor");
@@ -125,6 +151,7 @@ local function GetCableState()
         newState.right = rs.getInput("right");
         newState.up = rs.getInput("back");
         newState.down = rs.getInput("front");
+        newState.activate = rs.getInput("up");
         return newState; 
     else
         return redstoneTools.ReadLabeledCableState(labeledCableStates, redstoneSide);
@@ -185,6 +212,7 @@ end
 local function UpdateAllChunksPeriodically()
     while true do
         UpdateChunksAndAdjacentChunks();
+        FocusCenterScreenPos(monitor);
         os.sleep(10);
     end
 end
