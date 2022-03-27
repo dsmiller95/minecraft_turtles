@@ -1,15 +1,14 @@
 
 local fuelingTools = require("lib.fuelingTools");
 local position = require("lib.positionProvider");
-local build = require("lib.buildingTools");
 local mesh = require("lib.turtleMesh");
 local constants = require("lib.turtleMeshConstants");
-local generatorTools = require("lib.generatorTools");
 local rednetHelpers  = require("lib.rednetHelpers")
+local inventoryTools = require("lib.inventoryTools");
 
-local CABLE_ITEM_SLOT = 1;
-local CHEST_ITEM_SLOT = 2;
-local MODEM_ITEM_SLOT = 3;
+local CABLE_ITEM_SLOT = inventoryTools.GetItemHandle("computercraft:cable");
+local CHEST_ITEM_SLOT = inventoryTools.GetItemHandle("minecraft:chest");
+local MODEM_ITEM_SLOT = inventoryTools.GetItemHandle("computercraft:wired_modem_full");
 
 -- TODO:
     -- move to a target chunk
@@ -58,12 +57,14 @@ end
 
 local function PlaceCable(length)
     while turtle.digDown() do end
-    build.PlaceBlockFromSlotSafeDown(CABLE_ITEM_SLOT);
+    inventoryTools.SelectSlotForItemHandle(CABLE_ITEM_SLOT);
+    turtle.placeDown();
     for i = 1, (length - 1) do
         position.forwardWithDig();
         while turtle.digDown() do end
         while turtle.digUp() do end
-        build.PlaceBlockFromSlotSafeDown(CABLE_ITEM_SLOT);
+        inventoryTools.SelectSlotForItemHandle(CABLE_ITEM_SLOT);
+        turtle.placeDown();
     end
 end
 
@@ -103,9 +104,11 @@ local function GenerateCablePlaceCommands()
     coroutine.yield({
         ex = function ()
             while turtle.digDown() do end
-            build.PlaceBlockFromSlotSafeDown(MODEM_ITEM_SLOT);
+            inventoryTools.SelectSlotForItemHandle(MODEM_ITEM_SLOT);
+            turtle.placeDown();
             position.upWithDig();
-            build.PlaceBlockFromSlotSafeDown(CHEST_ITEM_SLOT);
+            inventoryTools.SelectSlotForItemHandle(CHEST_ITEM_SLOT);
+            turtle.placeDown();
         end,
         cost = 4,
         description = "place modem and chest"

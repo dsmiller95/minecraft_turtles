@@ -11,6 +11,52 @@ local function InventoryFull()
     return true;
 end
 
+-- Meta class
+TurtleItemHandle = {currentSlot=nil, itemName = nil }
+
+function TurtleItemHandle:new(itemName)
+    local o = {};
+    setmetatable(o, self);
+    self.__index = self;
+    o.itemName = itemName;
+    o.currentSlot = nil;
+    return o;
+ end
+
+ 
+function TurtleItemHandle:SearchForItem()
+    local initialSlot = turtle.getSelectedSlot();
+    for i = 1, 16 do
+        turtle.select((initialSlot + i) % 16);
+        if turtle.getItemCount() > 0 then
+            local itemName = turtle.getItemDetail().name;
+            if itemName == self.itemName then
+                return true;
+            end
+        end
+    end
+    return false;
+end
+
+function TurtleItemHandle:Select()
+    if not self.currentSlot or turtle.getItemCount(self.currentSlot) <= 0 or turtle.getItemDetail(self.currentSlot).name ~= self.itemName then
+        if not self:SearchForItem() then
+            error("no more " .. self.itemName .. "left");
+        end
+        self.currentSlot = turtle.getSelectedSlot();
+        return;
+    end
+    turtle.select(self.currentSlot);
+end
+
+local function GetItemHandle(itemName)
+    return TurtleItemHandle:new(itemName);
+end
+
+
+local function SelectSlotForItemHandle(handle)
+    handle:Select();
+end
 
 local function SelectSlotWithItemsSafe(slotNumber)
     turtle.select(slotNumber);
@@ -29,4 +75,9 @@ local function SelectSlotWithItemsSafe(slotNumber)
     end
 end
 
-return {InventoryFull=InventoryFull, SelectSlotWithItemsSafe = SelectSlotWithItemsSafe}
+
+return {
+    InventoryFull=InventoryFull,
+     SelectSlotWithItemsSafe = SelectSlotWithItemsSafe,
+     GetItemHandle=GetItemHandle,
+     SelectSlotForItemHandle=SelectSlotForItemHandle}
