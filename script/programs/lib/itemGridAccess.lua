@@ -5,10 +5,13 @@ local positionProvider = require("lib.positionProvider")
 
 local function GetItemPositionFromServer(itemName)
     rednetHelpers.EnsureModemOpen();
+    print("first wait");
     local itemServer = rednet.lookup("ITEMREQ", "item grid server");
     local req = "getItem {"..itemName.."}";
     rednet.send(itemServer, req, "ITEMREQ");
+    print("second wait");
     local id, msg = rednet.receive("ITEMRESP");
+    print("done wait");
     if msg == "INVALID REQUEST" then
         print("error: invalid request sent to item server: " .. req);
         return false;
