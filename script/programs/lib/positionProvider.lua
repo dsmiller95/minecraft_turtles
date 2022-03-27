@@ -28,7 +28,7 @@ local function ValidatePredictedPosition()
 end
 
 local function CurrentDirectionVector()
-    return directionToDiff[currentDirection];
+    return directionToDiff[currentDirection + 1];
 end
 
 local function UnitVectorToDirection(unitVector)
