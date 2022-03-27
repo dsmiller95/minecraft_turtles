@@ -80,5 +80,6 @@ while true do
             HandleDirectionButtonPress(name);
         end
     end
+    lastCableState = nextStates;
     os.sleep(0.5);
 end
