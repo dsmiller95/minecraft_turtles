@@ -56,13 +56,14 @@ function CompositeInventory:updateActiveSlot()
     while self.activeInventoryIndex <= table.maxn(self.inventories) do
         while self.currentSlot <= self:ActiveInventory().size() do
             if self:IsCurrentSlotValid() then
-                return;
+                return true;
             end
             self.currentSlot = self.currentSlot + 1;
         end
         self.currentSlot = 1;
         self.activeInventoryIndex = self.activeInventoryIndex + 1;
     end
+    return false;
 end
 
 
@@ -71,6 +72,9 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
     if not self.isSink then
         error("cannot pull into source inventory");
     end
+    if self:isComplete() then
+        return 0;
+    end
     while pullCount > 0 do
         local pulledItems = self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
         pullCount = pullCount - pulledItems;
@@ -78,7 +82,9 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
             -- force next slot. if the item can't be pulled in that means the stack must be full or incompatible
             self.currentSlot = self.currentSlot + 1;
         end
-        self:updateActiveSlot();
+        if not self:updateActiveSlot() then
+            return pullCount;
+        end
     end
     return pullCount;
 end
@@ -88,10 +94,15 @@ function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlo
     if self.isSink then
         error("cannot push from sink inventory");
     end
+    if self:isComplete() then
+        return 0;
+    end
     while pushCount > 0 do
         local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, pushCount, targetInventorySlot);
         pushCount = pushCount - pushedItems;
-        self:updateActiveSlot();
+        if not self:updateActiveSlot() then
+            return pushCount;
+        end
     end
     return pushCount;
 end
