@@ -114,7 +114,8 @@ local function MoveBack()
         if not currentDirection then
             currentDirection = (DeriveDirectionAfterMove() + 2) % 4;
         end
-        currentPosition = currentPosition:add(directionToDiff[currentDirection + 1]);
+        local oppositePos = (currentDirection + 2) % 4;
+        currentPosition = currentPosition:add(directionToDiff[oppositePos + 1]);
         ValidatePredictedPosition();
         return true;
     end
