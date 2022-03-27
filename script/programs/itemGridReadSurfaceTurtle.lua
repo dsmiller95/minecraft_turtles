@@ -16,6 +16,7 @@ local function DetermineType()
         return nil;
     end
     local detail = turtle.getItemDetail();
+    turtle.drop();
     return detail.name;
 end
 
