@@ -36,7 +36,7 @@ local function DeposItemsIfNeeded()
 end
 
 local function DigCell(initialPos, targetPos, width, height)
-    position.NavigateToPositionAsCommand(initialPos, targetPos, targetPos.y);
+    position.NavigateToPositionAsCommand(initialPos, targetPos, targetPos.y, {nudge=false});
     coroutine.yield({
         ex = function ()
             position.upWithDig();

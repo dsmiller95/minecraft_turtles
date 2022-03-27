@@ -191,7 +191,7 @@ local function PointInDirection(x, z)
 end
 
 local function Position()
-    return currentPosition
+    return vector.new(currentPosition.x, currentPosition.y, currentPosition.z);
 end
 
 
@@ -271,24 +271,16 @@ local function NavigateToPositionUnsafe(desiredPosition)
     end
 end
 
-local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride)
+
+
+local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride, safetyOptions)
     if not DetermineDirectionality() then
         error("could not determine direction");
     end
 
-    -- navigate away from reserved coords in chunks
-    if currentPosition.x % 16 == 8 then
-        if currentDirection % 2 == 0 then
-            TurnLeft()
-        end
-        MoveForwardDigIfNeeded();
-    end
-    if currentPosition.z % 16 == 8 then
-        if currentDirection % 2 == 1 then
-            TurnLeft();
-        end
-        MoveForwardDigIfNeeded();
-    end
+    safetyOptions = safetyOptions or {
+        nudge= true
+    };
 
     local distance = EstimateMoveTimeCost(currentPosition, desiredPosition);
     if distance <= 1 then
@@ -297,16 +289,26 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
         return;
     end
 
+    -- navigate away from reserved coords in chunks
+    if safetyOptions.nudge then
+        local nudgedTarget = vector.new(currentPosition.x, currentPosition.y, currentPosition.z);
+        if nudgedTarget.x % 16 == 8 then nudgedTarget.x = nudgedTarget.x + 1 end;
+        if nudgedTarget.z % 16 == 8 then nudgedTarget.z = nudgedTarget.z + 1 end; 
+        NavigateToPositionUnsafe(nudgedTarget);
+    end
+
     -- move up or down into my navigation layer
     local targetY = constants.NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
+    local nudgedTarget = vector.new(desiredPosition.x, targetY, desiredPosition.z);
+    if safetyOptions.nudge then
+        if nudgedTarget.x % 16 == 8 then nudgedTarget.x = nudgedTarget.x + 1 end;
+        if nudgedTarget.z % 16 == 8 then nudgedTarget.z = nudgedTarget.z + 1 end; 
+    end
     if optionalTransitHeightOverride then
         targetY = optionalTransitHeightOverride;
     end
+
     -- shift an interim target away from reserved layers
-    local nudgedTarget = vector.new(desiredPosition.x, desiredPosition.y, desiredPosition.z);
-    if nudgedTarget.x % 16 == 8 then nudgedTarget.x = nudgedTarget.x + 1 end;
-    if nudgedTarget.z % 16 == 8 then nudgedTarget.z = nudgedTarget.z + 1 end;
-    nudgedTarget.y = targetY;
     NavigateToPositionUnsafe(nudgedTarget);
     -- move down first, avoiding reserved channels as determined by nudgedTarget
     MoveToAltitude(desiredPosition.y);
@@ -314,11 +316,11 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
 end
 
 
-local function NavigateToPositionAsCommand(estimatedStartPos, endPos, optionalTransitHeightOverride)
+local function NavigateToPositionAsCommand(estimatedStartPos, endPos, optionalTransitHeightOverride, safetyOptions)
     coroutine.yield({
         ex = function ()
             print("navigating to " .. endPos:tostring());
-            NavigateToPositionSafe(endPos, optionalTransitHeightOverride);
+            NavigateToPositionSafe(endPos, optionalTransitHeightOverride, safetyOptions);
         end,
         cost = EstimateMoveTimeCost(estimatedStartPos, endPos),
         description = "Navigate to " .. endPos:tostring(),
