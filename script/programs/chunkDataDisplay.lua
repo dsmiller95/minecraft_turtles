@@ -184,7 +184,7 @@ local monitor = peripheral.find("monitor");
 monitor.setTextScale(4);
 local function UpdateAllChunksPeriodically()
     while true do
-        UpdateChunksAndAdjacentChunks();
+        UpdateChunksAndAdjacentChunks(monitor);
         FocusCenterScreenPos(monitor);
         os.sleep(10);
     end
@@ -195,9 +195,10 @@ local function HandleDirectionButtonPress(directionButton)
     if directionButton == "activate" then
         -- allow for 5, dissalow 0
         local scale = (monitor.getTextScale() % 5) + 0.5;
+        scale = scale.max(1, scale);
         monitor.setTextScale(scale);
         InitializeChunkTable(monitor);
-        UpdateChunksAndAdjacentChunks();
+        UpdateChunksAndAdjacentChunks(monitor);
     else
         print(directionButton);
         local moveDir = nil;
