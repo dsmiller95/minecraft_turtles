@@ -21,7 +21,7 @@ local function WriteItemData()
 end
 
 ReadItemData();
-WriteItemData()();
+WriteItemData();
 
 
 local function GetItemProvider(senderId, message)
