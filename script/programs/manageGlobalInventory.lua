@@ -48,7 +48,7 @@ function CompositeInventory:IsCurrentSlotValid()
         local diff = self:ActiveInventory().getItemLimit(self.currentSlot) - self:CurrentItemCount();
         return diff > 0;
     else    
-        return self:CurrentItemCount() > 0;
+        return self:CurrentItemCount() > 1;
     end
 end
 
@@ -98,7 +98,9 @@ function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlo
         return 0;
     end
     while pushCount > 0 do
-        local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, pushCount, targetInventorySlot);
+        -- never take more than 1 minus the available items
+        local actualAmount = math.min(self:CurrentItemCount() - 1, pushCount);
+        local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, actualAmount, targetInventorySlot);
         pushCount = pushCount - pushedItems;
         if not self:updateActiveSlot() then
             return pushCount;
