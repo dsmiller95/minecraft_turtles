@@ -11,6 +11,17 @@ local function InventoryFull()
     return true;
 end
 
+
+local function CountEmptySlots()
+    local sum;
+    for i = 1, MAX_TURTLE_SLOT do
+        if turtle.getItemCount(i) <= 0 then
+            sum = sum + 1;
+        end
+    end
+    return sum;
+end
+
 -- Meta class
 TurtleItemHandle = {currentSlot=nil, itemName = nil }
 
@@ -80,4 +91,5 @@ return {
     InventoryFull=InventoryFull,
      SelectSlotWithItemsSafe = SelectSlotWithItemsSafe,
      GetItemHandle=GetItemHandle,
-     SelectSlotForItemHandle=SelectSlotForItemHandle}
+     SelectSlotForItemHandle=SelectSlotForItemHandle,
+     CountEmptySlots=CountEmptySlots}

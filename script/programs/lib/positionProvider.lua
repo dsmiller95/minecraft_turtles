@@ -331,6 +331,19 @@ local function MoveToHoldingLocation()
 end
 
 
+local function GetCompleteOrientation()
+    DetermineDirectionality();
+    return {
+        pos = currentPosition,
+        dir = currentDirection
+    };
+end
+
+local function ReturnToOrientation(orientation)
+    NavigateToPositionSafe(orientation.pos);
+    PointInDirection(orientation.dir);
+end
+
 return {
     up=MoveUp,
     upWithDig=MoveUpDigIfNeeded,
@@ -353,5 +366,8 @@ return {
     DirectionRight  = DirectionRight,
     DirectionLeft = DirectionLeft,
     TurnPointingVectorRight=TurnPointingVectorRight,
-    TurnPointingVectorLeft=TurnPointingVectorLeft
+    TurnPointingVectorLeft=TurnPointingVectorLeft,
+
+    GetCompleteOrientation=GetCompleteOrientation,
+    ReturnToOrientation=ReturnToOrientation
 }

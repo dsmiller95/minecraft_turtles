@@ -20,11 +20,14 @@ end
     -- excavate layers at some height. perhaps bottom of the map.
 
 
-local function DepositItemsIfFull()
+local function DeposItemsIfNeeded()
+    -- empty inv if more than half full
     coroutine.yield({
         ex = function ()
-            if inventoryTools.InventoryFull() then
+            if inventoryTools.CountEmptySlots() < 8 then
+                local orient = position.GetCompleteOrientation();
                 mesh.EmptyInventoryIntoClosestChunk();
+                position.ReturnToOrientation(orient);
             end
         end,
         cost = 16 * 3,
@@ -32,22 +35,33 @@ local function DepositItemsIfFull()
     });
 end
 
+local function DigCell(initialPos, targetPos, width, height, cellX, cellY)
+    position.NavigateToPositionAsCommand(initialPos, targetPos, targetPos.y);
+    coroutine.yield({
+        ex = function ()
+            position.upWithDig();
+            buildingTools.ExcavateLayer(width, height, true, true, vector.new(1, 0, 0));
+            position.downWithDig();
+        end,
+        cost = width * height + width,
+        description = "excavate base chunk layer depth 3",
+    });
+    DeposItemsIfNeeded();
+    return targetPos;
+end
+
 local function ExcavateUpToBottomOfMesh()
     local defaultDigDirection = vector.new(1, 0, 0);
     local baseLayersToDig = constants.MESH_LAYER_MIN - constants.QUARRY_MIN;
     local fullLayersToDig = math.floor(baseLayersToDig / 3);
     for i = 1, fullLayersToDig do
-        coroutine.yield({
-            ex = function ()
-                position.upWithDig();
-                buildingTools.ExcavateLayer(16, 16, true, true, defaultDigDirection);
-                position.upWithDig();
-                position.upWithDig();
-            end,
-            cost = 16 * 16 + 16,
-            description = "excavate base chunk layer depth 3",
-        });
-        DepositItemsIfFull();
+        local target = GetTargetInChunk();
+        target.y = target.y + fullLayersToDig * 3;
+        local initial = target;
+        initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8)
+        initial = DigCell(initial, target + vector.new(8, 0, 0), 8, 8)
+        initial = DigCell(initial, target + vector.new(8, 8, 0), 8, 8)
+        initial = DigCell(initial, target + vector.new(0, 8, 0), 8, 8)
     end
     local extraLayers = baseLayersToDig % 3;
     if extraLayers == 1 then
@@ -70,7 +84,7 @@ local function ExcavateUpToBottomOfMesh()
             description = "excavate base chunk layer of depth 1",
         });
     end
-    DepositItemsIfFull();
+    DeposItemsIfNeeded();
 end
 
 local function ExcavateMeshGridExtraSpace()
@@ -83,7 +97,7 @@ local function ExcavateMeshGridExtraSpace()
         cost = 8 * 8 + 8,
         description = "excavate 0,0 chunk section",
     });
-    DepositItemsIfFull();
+    DeposItemsIfNeeded();
 
     local zeroChunkPos = GetTargetInChunk();
     zeroChunkPos.y = constants.MESH_LAYER_MIN + 1;
@@ -99,7 +113,7 @@ local function ExcavateMeshGridExtraSpace()
         cost = 8 * 8 + 8,
         description = "excavate 1,0 chunk section",
     });
-    DepositItemsIfFull();
+    DeposItemsIfNeeded();
     
     local target = zeroChunkPos + vector.new(9, 9, 0);
     position.NavigateToPositionAsCommand(initial, target);
@@ -111,7 +125,7 @@ local function ExcavateMeshGridExtraSpace()
         cost = 8 * 8 + 8,
         description = "excavate 1,1 chunk section",
     });
-    DepositItemsIfFull();
+    DeposItemsIfNeeded();
     
     local target = zeroChunkPos + vector.new(0, 9, 0);
     position.NavigateToPositionAsCommand(initial, target);
