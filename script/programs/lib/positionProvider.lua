@@ -205,12 +205,15 @@ local function DetermineDirectionality()
         return true;
     end
     if MoveForward() then
+        MoveBack();
         return true;
     end
     if MoveBack() then
+        MoveForward();
         return true;
     end
     MoveForwardDigIfNeeded();
+    MoveBack();
 end
 
 local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride)
