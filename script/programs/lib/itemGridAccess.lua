@@ -39,6 +39,7 @@ end
 
 local function GetAllItemsToSlotsAsCommands(itemRequests, initalPosition)
     initalPosition = initalPosition or position.Position();
+    local firstItem = true;
     for _, itemRequest in pairs(itemRequests) do
         local itemPosition = GetItemPositionFromServer(itemRequest.type);
         if not itemPosition then
@@ -46,7 +47,13 @@ local function GetAllItemsToSlotsAsCommands(itemRequests, initalPosition)
             return false;
         end
         local targetPosition = itemPosition + vector.new(0, 0, -2);
-        positionProvider.NavigateToPositionAsCommand(initalPosition, targetPosition);
+        if firstItem then
+            positionProvider.NavigateToPositionAsCommand(initalPosition, targetPosition); 
+            firstItem = false;
+        else
+            -- assume all item providers are co-located
+            positionProvider.NavigateToPositionAsCommand(initalPosition, targetPosition, targetPosition.y); 
+        end
         initalPosition = targetPosition;
         coroutine.yield({
             ex = function ()
