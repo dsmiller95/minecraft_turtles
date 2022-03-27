@@ -162,7 +162,7 @@ local function ShouldUpdateChunk(x, z)
     return false;
 end
 
-local function UpdateChunksAndAdjacentChunks()
+local function UpdateChunksAndAdjacentChunks(monitor)
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
             local chunkX, chunkZ = ScreenPosToChunk(x, z);
@@ -180,6 +180,8 @@ local function UpdateChunksAndAdjacentChunks()
     end
 end
 
+local monitor = peripheral.find("monitor");
+monitor.setTextScale(4);
 local function UpdateAllChunksPeriodically()
     while true do
         UpdateChunksAndAdjacentChunks();
@@ -189,8 +191,6 @@ local function UpdateAllChunksPeriodically()
 end
 
 
-local monitor = peripheral.find("monitor");
-monitor.setTextScale(4);
 local function HandleDirectionButtonPress(directionButton)
     if directionButton == "activate" then
         -- allow for 5, dissalow 0
