@@ -72,8 +72,9 @@ local function HandleDirectionButtonPress(directionButton)
 end
 
 InitializeChunkTable(monitor);
+local redstoneSide = arg[1];
 while true do
-    local nextStates = redstoneTools.ReadLabeledCableState(labeledCableStates, "left");
+    local nextStates = redstoneTools.ReadLabeledCableState(labeledCableStates, redstoneSide);
     for name, value in pairs(nextStates) do
         if value and not lastCableState[name] then
             HandleDirectionButtonPress(name);
