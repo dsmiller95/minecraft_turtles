@@ -148,6 +148,7 @@ local function WriteJobsToMonitor()
             return;
         end
         monitor.setTextScale(0.5);
+        monitor.clear();
         local updateTime = os.epoch("utc");
         for i, job in ipairs(allJobs) do
             monitor.setCursorPos(1, i);
