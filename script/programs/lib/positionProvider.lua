@@ -303,9 +303,9 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
         targetY = optionalTransitHeightOverride;
     end
     -- shift an interim target away from reserved layers
-    local nudgedTarget = desiredPosition;
-    if nudgedTarget.x == 8 then nudgedTarget.x = 9 end;
-    if nudgedTarget.z == 8 then nudgedTarget.z = 9 end;
+    local nudgedTarget = vector.new(desiredPosition.x, desiredPosition.y, desiredPosition.z);
+    if nudgedTarget.x % 16 == 8 then nudgedTarget.x = nudgedTarget.x + 1 end;
+    if nudgedTarget.z % 16 == 8 then nudgedTarget.z = nudgedTarget.z + 1 end;
     nudgedTarget.y = targetY;
     NavigateToPositionUnsafe(nudgedTarget);
     -- move down first, avoiding reserved channels as determined by nudgedTarget
@@ -345,7 +345,9 @@ end
 
 local function ReturnToOrientation(orientation)
     NavigateToPositionSafe(orientation.pos);
-    PointInDirection(orientation.dir);
+    while currentDirection ~= orientation.dir do
+        TurnLeft();
+    end
 end
 
 return {
