@@ -13,7 +13,7 @@ end
 
 
 local function CountEmptySlots()
-    local sum;
+    local sum = 0;
     for i = 1, MAX_TURTLE_SLOT do
         if turtle.getItemCount(i) <= 0 then
             sum = sum + 1;
