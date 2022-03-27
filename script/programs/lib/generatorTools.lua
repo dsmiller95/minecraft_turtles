@@ -2,8 +2,13 @@
 local function GetListFromGeneratorFunction(genFn)
     local list= {};
     local co = coroutine.create(genFn)
+    local resumeArguments = {};
     while coroutine.status(co) ~= "dead" do
-        local code, res = coroutine.resume(co)
+        local resumeResult;
+        table.insert(resumeArguments,1, co);
+        resumeResult = {coroutine.resume(unpack(resumeArguments))};
+        
+        local code, res = resumeResult[1], resumeResult[2];
         print(code);
         print(res);
         if not code then
@@ -11,10 +16,14 @@ local function GetListFromGeneratorFunction(genFn)
             print(res);
             return nil;
         end
-        if res ~= nil then
+        if res ~= nil and res.ex then
             table.insert(list, res);
+            resumeArguments = {};
+        else
+            -- if not a command, then passthrough yield up to the next up thread
+            table.remove(resumeResult, 1);
+            resumeArguments = {coroutine.yield(unpack(resumeResult))};
         end
-        coroutine.yield();
     end
     return list;
 end
