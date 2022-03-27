@@ -42,7 +42,6 @@ local function WriteChunkData(chunk)
     local name = ToChunkName(chunk.x, chunk.z);
     chunkTable[name] = chunk;
 end
-local monitor = peripheral.find("monitor");
 
 local colorsByChunkStats = {
     [consts.CHUNK_STATUS.WILDERNESS] = colors.black;
@@ -53,7 +52,7 @@ local colorsByChunkStats = {
 
 local function ScreenPosToChunk(x, z)
     local halfWidth, halfHeight = math.floor(chunkWidth/2), math.floor(chunkHeight/2);
-    return x - halfWidth, z - halfHeight;
+    return x - halfWidth + centerChunk.x, z - halfHeight + centerChunk.z;
 end
 
 local function InitializeChunkTable(monitor)
@@ -100,6 +99,8 @@ local lastCableState = {
     ["down"]=false,
 }
 
+local monitor = peripheral.find("monitor");
+monitor.setTextScale(4);
 local function HandleDirectionButtonPress(directionButton)
     print(directionButton);
     local moveDir = nil;
