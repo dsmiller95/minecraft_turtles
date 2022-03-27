@@ -12,7 +12,7 @@ local function GetItemPositionFromServer(itemName)
     if msg == "INVALID REQUEST" then
         error("invalid request sent to item server: " .. req)
     end
-    local item = textutils.deserialize(msg);
+    local item = textutils.unserialize(msg);
     if not item then
         return nil;
     end
