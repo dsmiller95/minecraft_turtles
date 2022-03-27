@@ -52,16 +52,13 @@ local colorsByChunkStats = {
 }
 
 local function ScreenPosToChunk(x, z)
-    
     local halfWidth, halfHeight = math.floor(chunkWidth/2), math.floor(chunkHeight/2);
     return x - halfWidth, z - halfHeight;
-
 end
 
 local function InitializeChunkTable(monitor)
     chunkWidth, chunkHeight = monitor.getSize();
     chunkTable = {};
-    local halfHeight, halfWidth = math.floor(chunkHeight/2), math.floor(chunkWidth/2);
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
             local status = consts.CHUNK_STATUS.FUELED;
