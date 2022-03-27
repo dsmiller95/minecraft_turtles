@@ -21,7 +21,7 @@ local function GenerateMoveChunkCommands()
     local initial = position.Position();
     local target = GetTargetInChunk();
     
-    position.NavigateToPositionAsCommand(initial, target, constants.MESH_LAYER_MIN + 1);
+    position.NavigateToPositionAsCommand(initial, target);
 end
     -- excavate layers at some height. perhaps bottom of the map.
 local excavateTimeRemaining = 0;
