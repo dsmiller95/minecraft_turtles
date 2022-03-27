@@ -53,6 +53,7 @@ local function ExcavateLayer(width, length, digUp, digDown)
         DigStraight(length-1, digUp, digDown);
         position.turnLeft(); position.turnLeft();
         DigStraight(length-1, digUp, digDown);
+        position.turnLeft(); position.turnLeft();
     end
     position.turnLeft();
     DigStraight(width-1, digUp, digDown);
