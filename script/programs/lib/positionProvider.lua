@@ -233,9 +233,7 @@ local function DetermineDirectionality()
     MoveBack();
 end
 
-local function NavigateToPositionUnsafe(desiredPosition)
-    MoveToAltitude(desiredPosition.y);
-
+local function MoveToTransverse(desiredPosition)
     -- move in the x direction
     local desiredRotation = nil;
     if desiredPosition.x > currentPosition.x then
@@ -271,7 +269,16 @@ local function NavigateToPositionUnsafe(desiredPosition)
     end
 end
 
+local function NavigateToPositionUnsafe(desiredPosition)
+    MoveToAltitude(desiredPosition.y);
+    MoveToTransverse(desiredPosition);
+end
 
+local function NudgeToSafe(pos)
+    if pos.x % 16 == 8 then pos.x = pos.x + 1 end;
+    if pos.z % 16 == 8 then pos.z = pos.z + 1 end; 
+    return pos;
+end
 
 local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOverride, safetyOptions)
     if not DetermineDirectionality() then
@@ -289,27 +296,27 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
         return;
     end
 
-    -- navigate away from reserved coords in chunks
+    local safeOrigin = vector.new(currentPosition.x, currentPosition.y, currentPosition.z);
+    local safeDestination = vector.new(desiredPosition.x, desiredPosition.y, desiredPosition.z);
     if safetyOptions.nudge then
-        local nudgedTarget = vector.new(currentPosition.x, currentPosition.y, currentPosition.z);
-        if nudgedTarget.x % 16 == 8 then nudgedTarget.x = nudgedTarget.x + 1 end;
-        if nudgedTarget.z % 16 == 8 then nudgedTarget.z = nudgedTarget.z + 1 end; 
-        NavigateToPositionUnsafe(nudgedTarget);
+        safeOrigin = NudgeToSafe(safeOrigin);
+        NavigateToPositionUnsafe(safeOrigin);
+        safeDestination = NudgeToSafe(safeDestination);
     end
 
     -- move up or down into my navigation layer
     local targetY = constants.NAVIGATIONN_LAYER_MIN + GetReservedNavigationLayer();
-    local nudgedTarget = vector.new(desiredPosition.x, targetY, desiredPosition.z);
-    if safetyOptions.nudge then
-        if nudgedTarget.x % 16 == 8 then nudgedTarget.x = nudgedTarget.x + 1 end;
-        if nudgedTarget.z % 16 == 8 then nudgedTarget.z = nudgedTarget.z + 1 end; 
+    if safeOrigin.x == safeDestination.x and safeOrigin.z == safeDestination.z then
+        -- if there is no transverse move in navigation layer, go directly to the destination
+        targetY = safeDestination.y
     end
     if optionalTransitHeightOverride then
         targetY = optionalTransitHeightOverride;
     end
+    
+    MoveToAltitude(targetY);
+    MoveToTransverse(safeDestination);
 
-    -- shift an interim target away from reserved layers
-    NavigateToPositionUnsafe(nudgedTarget);
     -- move down first, avoiding reserved channels as determined by nudgedTarget
     MoveToAltitude(desiredPosition.y);
     NavigateToPositionUnsafe(desiredPosition);

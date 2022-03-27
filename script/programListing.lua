@@ -10,5 +10,5 @@ return {
         "lib/rednetHelpers", "lib/generatorTools",
         "jobs/deployServiceGrid", "jobs/dummyJob", "jobs/quarryServiceGridLayers"
     },
-    version = "0.0.128"
+    version = "0.0.129"
 };
