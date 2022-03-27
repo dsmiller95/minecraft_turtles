@@ -24,8 +24,8 @@ ItemRequest = {type="minecraft:cobblestone", count=100 };
 
 local function SelectFreeSlot()
     local initialSlot = turtle.getSelectedSlot();
-    for i = 1, 16 do
-        turtle.select((initialSlot + i) % 16);
+    for i = 0, 15 do
+        turtle.select(((initialSlot + i) % 16) + 1);
         if turtle.getItemCount() <= 0 then
             return true;
         end

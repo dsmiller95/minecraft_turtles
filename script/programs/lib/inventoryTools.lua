@@ -26,8 +26,8 @@ function TurtleItemHandle:new(itemName)
  
 function TurtleItemHandle:SearchForItem()
     local initialSlot = turtle.getSelectedSlot();
-    for i = 1, 16 do
-        turtle.select((initialSlot + i) % 16);
+    for i = 0, 15 do
+        turtle.select(((initialSlot + i) % 16) + 1);
         if turtle.getItemCount() > 0 then
             local itemName = turtle.getItemDetail().name;
             if itemName == self.itemName then
