@@ -56,7 +56,8 @@ local function GetAllItemsToSlotsAsCommands(itemRequests, initalPosition)
                 local num = itemRequest.count;
                 while num > 0 do
                     SelectFreeSlot();
-                    if not turtle.suck(num) then
+                    local succNum = math.min(num, 64);
+                    if not turtle.suck(succNum) then
                         error("could not recieve item " .. itemRequest.type);
                     end
                     num = num - turtle.getItemCount();
