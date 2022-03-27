@@ -56,24 +56,15 @@ local function ExecuteCommands(commands, timeRemainingCallback)
     end
 end
 
-local function RunJob(job)
-    local paramList={}
-    for str in string.gmatch(job.job, "([^ ]+)") do
-        table.insert(paramList, str)
-    end
-    if table.maxn(paramList) < 1 then
-        error("invalid job, no job id");
-    end
-    local jobFile = require("jobs." .. paramList[1]);
-    table.remove(paramList, 1);
-
+local function RunGeneratorFunctionCommandsAsJob(genFn)
+    local jobCommands = generatorTools.GetListFromGeneratorFunction(function() genFn() end);
     local remainingTime = 0;
     local updateTimeRemaing = function (time)
         remainingTime = time;
         print("remaining time" .. time);
     end
 
-    local jobCommands = generatorTools.GetListFromGeneratorFunction(function() jobFile.RunJob(paramList) end);
+
     LogInfo("Job command list:");
     for _, com in pairs(jobCommands) do
         LogInfo(com.description or "unknown command");
@@ -90,6 +81,21 @@ local function RunJob(job)
     ExecuteCommands(jobCommands, updateTimeRemaing);
     return true;
 end
+
+local function RunJob(job)
+    local paramList={}
+    for str in string.gmatch(job.job, "([^ ]+)") do
+        table.insert(paramList, str)
+    end
+    if table.maxn(paramList) < 1 then
+        error("invalid job, no job id");
+    end
+    local jobFile = require("jobs." .. paramList[1]);
+    table.remove(paramList, 1);
+
+    return RunGeneratorFunctionCommandsAsJob(function() jobFile.RunJob(paramList) end);
+end
+
 
 local function TryFindJob()
     local id, message = rednet.receive("JOBANC");
@@ -137,4 +143,5 @@ return {
     RunJob = RunJob,
     InitLog = InitLog,
     CloseLog = CloseLog,
+    RunGeneratorFunctionCommandsAsJob=RunGeneratorFunctionCommandsAsJob,
 }
