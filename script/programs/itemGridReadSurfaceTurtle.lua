@@ -12,7 +12,7 @@ local function DetermineType()
         turtle.dropDown();
     end
     turtle.suck();
-    if turtle.getItemCount() < 0 then
+    if turtle.getItemCount() <= 0 then
         return nil;
     end
     local detail = turtle.getItemDetail();
