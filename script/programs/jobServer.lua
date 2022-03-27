@@ -1,7 +1,7 @@
 local allJobs = {};
 
 -- Meta class
-Job = {claimedComputerId=nil, jobType=nil, lastUpdateFromClaimant=nil, sortWeight = 1, status=nil, command=nil }
+Job = {claimedComputerId=nil, jobType=nil, lastUpdateFromClaimant=nil, sortWeight = 1, status=nil, command=nil, estimatedRemainingTime=nil }
 
 -- Derived class method new
 
@@ -38,7 +38,7 @@ local function PeriodicAnnounce()
 end
 
 local function UpdateJob(claimantId, msg)
-    local s, e, newStatus = string.find(msg, "Update (.+)");
+    local s, e, newStatus, timeData = string.find(msg, "Update {(.+)} {(%d+)}");
     local updateTime = os.epoch("utc");
 
     local jobIndex = indexOf(allJobs, 
@@ -54,6 +54,9 @@ local function UpdateJob(claimantId, msg)
     local job = allJobs[jobIndex];
     job.lastUpdateFromClaimant = updateTime;
     job.status = newStatus;
+    if timeData then
+        job.estimatedRemainingTime = tonumber(timeData); 
+    end
     if job.status == "COMPLETE" then
         print("job completed");
         table.remove(allJobs, jobIndex);
@@ -113,7 +116,7 @@ local function QueueJobs()
             for _, job in pairs(allJobs) do
                 os.sleep(1);
                 local claimTime = os.date(nil, (job.lastUpdateFromClaimant or 0) / 1000);
-                print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command .. ":" .. claimTime);
+                print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command .. ":" .. claimTime .. ":" .. tostring(job.estimatedRemainingTime or 0));
             end
         elseif string.find(msg, "queue ") == 1 then
             local s, e, command = string.find(msg, "queue {(.*)}");

@@ -56,11 +56,12 @@ local function ExecuteCommands(commands, timeRemainingCallback)
     end
 end
 
+local reaminingTimeOfJob = 0;
 local function RunGeneratorFunctionCommandsAsJob(genFn)
     local jobCommands = generatorTools.GetListFromGeneratorFunction(function() genFn() end);
-    local remainingTime = 0;
+    reaminingTimeOfJob = 0;
     local updateTimeRemaing = function (time)
-        remainingTime = time;
+        reaminingTimeOfJob = time;
         print("remaining time" .. time);
     end
 
@@ -73,7 +74,7 @@ local function RunGeneratorFunctionCommandsAsJob(genFn)
     updateTimeRemaing(GetCommandCost(jobCommands));
 
     -- ensure sufficient fuel to complete the operation and/or has available fuel source
-    local requiredFuel = remainingTime * 2;
+    local requiredFuel = reaminingTimeOfJob * 2;
     if not turtleMesh.EnsureMinimumFuelRequirementMet(requiredFuel) then
         print("insufficient fuel to complete operation. need at least " .. tostring(requiredFuel));
         return false;
@@ -112,10 +113,10 @@ local function TryFindJob()
     local jobSuccess = RunJob(job);
     isJobActive = false;
     if jobSuccess then
-        rednet.send(serverId, "Update COMPLETE", "JOB"); 
+        rednet.send(serverId, "Update {COMPLETE} {0}", "JOB"); 
     else
         -- could not run job. unclaim it.
-        rednet.send(serverId, "Update REJECTED", "JOB");
+        rednet.send(serverId, "Update {REJECTED} {0}", "JOB");
     end
 end
 
@@ -130,7 +131,7 @@ end
 local function EmitJobUpdates()
     while true do
         if isJobActive then
-            rednet.send(serverId, "Update PENDING", "JOB");
+            rednet.send(serverId, "Update {PENDING} {"..reaminingTimeOfJob.."}", "JOB");
         end
         os.sleep(5);
     end
