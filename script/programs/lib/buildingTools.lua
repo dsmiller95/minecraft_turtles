@@ -23,7 +23,17 @@ local function DigStraight(length, digUp, digDown)
     end
 end
 
-local function ExcavateLayer(width, length, digUp, digDown)
+--- dig out a rectangle. length is the dimension parallel to the direction vector, width is mined 
+---     at a right hand turn from the direction vector
+---@param width number
+---@param length number
+---@param digUp boolean
+---@param digDown boolean
+---@param direction vector
+local function ExcavateLayer(width, length, digUp, digDown, direction)
+    --TODO: automatically choose the smallest width
+    direction = direction or position.CurrentDirectionVector();
+    position.PointInDirection(direction.x, direction.z)
     if digUp then turtle.digUp(); end
     if digDown then turtle.digDown(); end
     local extraSide = width % 2 == 1;
@@ -62,9 +72,19 @@ local function ExcavateLayer(width, length, digUp, digDown)
     position.turnRight();
 end
 
+local function ExcavateLayerAsCommand(width, length, digUp, digDown, direction)
+    coroutine.yield({
+        ex = function ()
+            ExcavateLayer(width, length, digUp, digDown, direction);
+        end,
+        cost = width * length + length,
+        description = "excavate "..width.."by"..length.." pointing at "..direction,
+    });
+end
 
 return {
     PlaceBlockFromSlotSafeDown=PlaceBlockFromSlotSafeDown,
     PlaceBlockFromSlotSafeUp= PlaceBlockFromSlotSafeUp,
-    ExcavateLayer=ExcavateLayer
+    ExcavateLayer=ExcavateLayer,
+    ExcavateLayerAsCommand=ExcavateLayerAsCommand,
 }

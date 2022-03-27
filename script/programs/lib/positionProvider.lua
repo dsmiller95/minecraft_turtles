@@ -41,6 +41,23 @@ local function UnitVectorToDirection(unitVector)
     return nil;
 end
 
+local function DirectionRight(originDirect)
+    return (originDirect + 1) % 4;
+end
+local function TurnPointingVectorRight(origin)
+    local direction = UnitVectorToDirection(origin);
+    direction = DirectionRight(direction);
+    return directionToDiff[direction + 1];
+end
+local function DirectionLeft(originDirect)
+    return (originDirect + 3) % 4;
+end
+local function TurnPointingVectorLeft(origin)
+    local direction = UnitVectorToDirection(origin);
+    direction = DirectionLeft(direction);
+    return directionToDiff[direction + 1];
+end
+
 local function DeriveDirectionAfterMove()
     -- we don't know what direction we're facing yet. take a measurement and figure it out
     local nextPosition = vector.new(gps.locate());
@@ -131,7 +148,7 @@ end
 local function TurnRight()
     local didMove, error = turtle.turnRight();
     if didMove and currentDirection then
-        currentDirection = (currentDirection + 1) % 4;
+        currentDirection = DirectionRight(currentDirection)
         return true;
     end
     return didMove, error;
@@ -139,7 +156,7 @@ end
 local function TurnLeft()
     local didMove, error = turtle.turnLeft();
     if didMove and currentDirection then
-        currentDirection = (currentDirection + 3) % 4;
+        currentDirection = DirectionLeft(currentDirection);
         return true;
     end
     return didMove, error;
@@ -331,5 +348,10 @@ return {
     EstimateMoveTimeCost = EstimateMoveTimeCost,
     MoveToHoldingLocation=MoveToHoldingLocation,
     DetermineDirectionality=DetermineDirectionality,
-    CurrentDirectionVector=CurrentDirectionVector
+    
+    CurrentDirectionVector=CurrentDirectionVector,
+    DirectionRight  = DirectionRight,
+    DirectionLeft = DirectionLeft,
+    TurnPointingVectorRight=TurnPointingVectorRight,
+    TurnPointingVectorLeft=TurnPointingVectorLeft
 }

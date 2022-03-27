@@ -2,6 +2,7 @@ return {
     FUEL_CHEST_COORDS_IN_CHUNK = vector.new(8, 13, 8),
     NAVIGATION_LAYER_ALLOCATION = 10,
     NAVIGATIONN_LAYER_MIN = 14,
+    QUARRY_MIN = 5,
     MESH_LAYER_MIN = 11,
     MESH_LAYER_MAX = 14,
     INVENTORY_SLOTS = {
@@ -16,6 +17,7 @@ return {
     CHUNK_STATUS = {
         WILDERNESS = 0,
         FUELED = 1,
-        MINED = 2
+        MESH_QUARRIED=2,
+        COMPLETELY_MINED = 20
     }
 }

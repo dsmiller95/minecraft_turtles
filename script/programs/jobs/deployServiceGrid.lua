@@ -22,36 +22,6 @@ local function GenerateMoveChunkCommands(initialPosition)
     
     position.NavigateToPositionAsCommand(initialPosition, target);
 end
-    -- excavate layers at some height. perhaps bottom of the map.
-local excavateTimeRemaining = 0;
-local function ExcavateChunkArea(layerHeight)
-    position.PointInDirection(1, 0);
-    for y = 1, layerHeight do
-        for z = 1, 8 do
-            for x = 1, 15 do
-                fuelingTools.EnsureFueled();
-                position.forwardWithDig(); 
-            end
-            position.turnRight();
-            position.forwardWithDig(); 
-            position.turnRight();
-            for x = 1, 15 do
-                fuelingTools.EnsureFueled();
-                position.forwardWithDig(); 
-            end
-            position.turnLeft();
-            position.forwardWithDig();
-            position.turnLeft();
-        end
-        position.turnLeft();
-        for i = 1, 16 do
-            fuelingTools.EnsureFueled();
-            position.forwardWithDig();
-        end
-        position.turnRight();
-        position.upWithDig();
-    end
-end
     -- place grid of cable inside the chunk
 
 

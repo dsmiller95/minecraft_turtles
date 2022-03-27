@@ -8,7 +8,7 @@ return {
         "lib/fuelingTools", "lib/buildingTools", "lib/itemGridAccess",
         "lib/inventoryTools", "lib/positionProvider", "lib/turtleMesh", "lib/turtleMeshConstants",
         "lib/rednetHelpers", "lib/generatorTools",
-        "jobs/deployServiceGrid", "jobs/dummyJob"
+        "jobs/deployServiceGrid", "jobs/dummyJob", "jobs/quarryServiceGridLayers"
     },
-    version = "0.0.121"
+    version = "0.0.122"
 };
