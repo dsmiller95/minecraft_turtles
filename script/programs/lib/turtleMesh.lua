@@ -129,4 +129,5 @@ return {
     SetChunkStatusOnServer = SetChunkStatusOnServer,
     GetChunkFromPosition=GetChunkFromPosition,
     EnsureMinimumFuelRequirementMet = EnsureMinimumFuelRequirementMet,
-    EmptyInventoryIntoClosestChunk = EmptyInventoryIntoClosestChunk}
+    EmptyInventoryIntoClosestChunk = EmptyInventoryIntoClosestChunk,
+    GetClosestConnectedChunk = GetClosestConnectedChunk}
