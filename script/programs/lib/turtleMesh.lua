@@ -56,12 +56,16 @@ local function GetClosestConnectedChunk()
     local chunkX, chunkZ = GetChunkFromPosition(position.Position());
     local status = GetChunkStatusFromServer(chunkX, chunkZ);
 
-    local adjacentIndex = 1;
-    while status < constants.CHUNK_STATUS.FUELED and adjacentIndex <= 4 do
+    if status >= constants.CHUNK_STATUS.FUELED then
+        return chunkX, chunkZ;
+    end
+
+    local adjacentIndex = 0;
+    while status < constants.CHUNK_STATUS.FUELED and adjacentIndex < 4 do
+        adjacentIndex = adjacentIndex + 1;
          status = GetChunkStatusFromServer(
             chunkX + adjacents[adjacentIndex][1],
             chunkZ + adjacents[adjacentIndex][2])
-        adjacentIndex = adjacentIndex + 1;
     end
     if status < constants.CHUNK_STATUS.FUELED or adjacentIndex > 4 then
         return nil;
