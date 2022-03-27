@@ -118,10 +118,22 @@ local function HandleDirectionButtonPress(directionButton)
     DrawChunkStates(monitor);
 end
 
+local function GetCableState()
+    if redstoneSide == "positional" then
+        local newState = {};
+        newState.left = rs.getInput("left");
+        newState.right = rs.getInput("right");
+        newState.up = rs.getInput("back");
+        newState.down = rs.getInput("front");
+        return newState; 
+    else
+        return redstoneTools.ReadLabeledCableState(labeledCableStates, redstoneSide);
+    end
+end
 
 local function WatchForRedstoneChangeEvents()
     while true do
-        local nextStates = redstoneTools.ReadLabeledCableState(labeledCableStates, redstoneSide);
+        local nextStates = GetCableState();
         for name, value in pairs(nextStates) do
             if value and not lastCableState[name] then
                 HandleDirectionButtonPress(name);
