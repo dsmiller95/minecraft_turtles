@@ -44,7 +44,7 @@ local function DigCell(initialPos, targetPos, width, height)
             position.downWithDig();
         end,
         cost = width * height + width,
-        description = "excavate "..width.."x"..height.."x3",
+        description = "excavate "..width.."x"..height.."x3 at " .. targetPos:tostring(),
     });
     DeposItemsIfNeeded();
     return targetPos;
@@ -88,55 +88,13 @@ local function ExcavateUpToBottomOfMesh()
 end
 
 local function ExcavateMeshGridExtraSpace()
-    local defaultDigDirection = vector.new(1, 0, 0);
-    coroutine.yield({
-        ex = function ()
-            position.upWithDig();
-            buildingTools.ExcavateLayer(8, 8, true, true, defaultDigDirection);
-        end,
-        cost = 8 * 8 + 8,
-        description = "excavate 0,0 chunk section",
-    });
-    DeposItemsIfNeeded();
-
-    local zeroChunkPos = GetTargetInChunk();
-    zeroChunkPos.y = constants.MESH_LAYER_MIN + 1;
-    local initial = zeroChunkPos;
-
-    local target = zeroChunkPos + vector.new(9, 0, 0);
-    position.NavigateToPositionAsCommand(initial, target);
-    initial = target;
-    coroutine.yield({
-        ex = function ()
-            buildingTools.ExcavateLayer(8, 7, true, true, defaultDigDirection);
-        end,
-        cost = 8 * 8 + 8,
-        description = "excavate 1,0 chunk section",
-    });
-    DeposItemsIfNeeded();
-    
-    local target = zeroChunkPos + vector.new(9, 9, 0);
-    position.NavigateToPositionAsCommand(initial, target);
-    initial = target;
-    coroutine.yield({
-        ex = function ()
-            buildingTools.ExcavateLayer(7, 7, true, true, defaultDigDirection);
-        end,
-        cost = 8 * 8 + 8,
-        description = "excavate 1,1 chunk section",
-    });
-    DeposItemsIfNeeded();
-    
-    local target = zeroChunkPos + vector.new(0, 9, 0);
-    position.NavigateToPositionAsCommand(initial, target);
-    initial = target;
-    coroutine.yield({
-        ex = function ()
-            buildingTools.ExcavateLayer(7, 8, true, true, defaultDigDirection);
-        end,
-        cost = 8 * 8 + 8,
-        description = "excavate 0,1 chunk section",
-    });
+    local target = GetTargetInChunk();
+    target.y = constants.MESH_LAYER_MIN;
+    local initial = target;
+    initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8)
+    initial = DigCell(initial, target + vector.new(9, 0, 0), 8, 7)
+    initial = DigCell(initial, target + vector.new(9, 9, 0), 7, 7)
+    initial = DigCell(initial, target + vector.new(0, 9, 0), 7, 8)
 end
 
 local function WrapUp()
