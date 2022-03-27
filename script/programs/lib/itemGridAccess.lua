@@ -6,8 +6,6 @@ local positionProvider = require("lib.positionProvider")
 local function GetItemPositionFromServer(itemName)
     rednetHelpers.EnsureModemOpen();
     print("first wait");
-    local a, b = rednet.receive("ITEMRESP");
-    print("second wait");
     local itemServer = rednet.lookup("ITEMREQ", "item grid server");
     local req = "getItem {"..itemName.."}";
     rednet.send(itemServer, req, "ITEMREQ");
