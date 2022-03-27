@@ -126,24 +126,6 @@ local lastCableState = {
     ["activate"]=false,
 }
 
-local monitor = peripheral.find("monitor");
-monitor.setTextScale(4);
-local function HandleDirectionButtonPress(directionButton)
-    print(directionButton);
-    local moveDir = nil;
-    if directionButton == "left" then
-        moveDir = {x=-1, z=0};
-    elseif directionButton=="right" then
-        moveDir = {x=1, z=0};
-    elseif directionButton=="up" then
-        moveDir = {x=0, z=-1};
-    elseif directionButton=="down" then
-        moveDir = {x=0, z=1};
-    end
-    centerChunk.x = centerChunk.x + moveDir.x;
-    centerChunk.z = centerChunk.z + moveDir.z;
-    DrawChunkStates(monitor);
-end
 
 local function GetCableState()
     if redstoneSide == "positional" then
@@ -159,18 +141,6 @@ local function GetCableState()
     end
 end
 
-local function WatchForRedstoneChangeEvents()
-    while true do
-        local nextStates = GetCableState();
-        for name, value in pairs(nextStates) do
-            if value and not lastCableState[name] then
-                HandleDirectionButtonPress(name);
-            end
-        end
-        lastCableState = nextStates;
-        os.sleep(0.5);
-    end
-end
 
 local adj = {
     {x=1, z=0},
@@ -215,6 +185,46 @@ local function UpdateAllChunksPeriodically()
         UpdateChunksAndAdjacentChunks();
         FocusCenterScreenPos(monitor);
         os.sleep(10);
+    end
+end
+
+
+local monitor = peripheral.find("monitor");
+monitor.setTextScale(4);
+local function HandleDirectionButtonPress(directionButton)
+    if directionButton == "activate" then
+        -- allow for 5, dissalow 0
+        local scale = (monitor.getTextScale() % 5) + 0.5;
+        monitor.setTextScale(scale);
+        InitializeChunkTable(monitor);
+        UpdateChunksAndAdjacentChunks();
+    else
+        print(directionButton);
+        local moveDir = nil;
+        if directionButton == "left" then
+            moveDir = {x=-1, z=0};
+        elseif directionButton=="right" then
+            moveDir = {x=1, z=0};
+        elseif directionButton=="up" then
+            moveDir = {x=0, z=-1};
+        elseif directionButton=="down" then
+            moveDir = {x=0, z=1};
+        end
+        centerChunk.x = centerChunk.x + moveDir.x;
+        centerChunk.z = centerChunk.z + moveDir.z;
+    end
+    DrawChunkStates(monitor);
+end
+local function WatchForRedstoneChangeEvents()
+    while true do
+        local nextStates = GetCableState();
+        for name, value in pairs(nextStates) do
+            if value and not lastCableState[name] then
+                HandleDirectionButtonPress(name);
+            end
+        end
+        lastCableState = nextStates;
+        os.sleep(0.5);
     end
 end
 
