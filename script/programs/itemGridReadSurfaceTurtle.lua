@@ -21,11 +21,8 @@ local function DetermineType()
 end
 
 
-rednetHelpers   .EnsureModemOpen();
-if not positionProvider.back() then
-    error("please clear butt");
-end
-positionProvider.forward();
+rednetHelpers.EnsureModemOpen();
+positionProvider.DetermineDirectionality();
 local itemServer = rednet.lookup("ITEMREQ");
 for x = 1, width do
     for y = 1, height do
