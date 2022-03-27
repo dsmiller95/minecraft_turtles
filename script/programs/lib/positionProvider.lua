@@ -291,8 +291,7 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
     end
 
     local distance = EstimateMoveTimeCost(currentPosition, desiredPosition);
-    local heightDiff = math.abs(currentPosition.y - desiredPosition.y);
-    if distance <= 1 or distance == heightDiff then
+    if distance <= 1 then
         -- if we there already, or directly above, just go right there
         NavigateToPositionUnsafe(desiredPosition);
         return;
@@ -303,10 +302,15 @@ local function NavigateToPositionSafe(desiredPosition, optionalTransitHeightOver
     if optionalTransitHeightOverride then
         targetY = optionalTransitHeightOverride;
     end
-    local iterimTarget = vector.new(desiredPosition.x, targetY, desiredPosition.z);
-    NavigateToPositionUnsafe(iterimTarget);
-
+    -- shift an interim target away from reserved layers
+    local nudgedTarget = desiredPosition;
+    if nudgedTarget.x == 8 then nudgedTarget.x = 9 end;
+    if nudgedTarget.z == 8 then nudgedTarget.z = 9 end;
+    nudgedTarget.y = targetY;
+    NavigateToPositionUnsafe(nudgedTarget);
+    -- move down first, avoiding reserved channels as determined by nudgedTarget
     MoveToAltitude(desiredPosition.y);
+    NavigateToPositionUnsafe(desiredPosition);
 end
 
 
