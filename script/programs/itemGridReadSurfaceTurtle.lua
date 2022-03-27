@@ -29,7 +29,7 @@ for x = 1, width do
         local itemType = DetermineType();
         if itemType then
             local itemPos = positionProvider.Position() + positionProvider.CurrentDirectionVector();
-            rednet.send(itemServer, "provideItem {" .. itemType .. "} (" .. itemPos:tostring() .. ")")
+            rednet.send(itemServer, "provideItem {" .. itemType .. "} (" .. itemPos:tostring() .. ")", "ITEMREQ")
         end
         positionProvider.downWithDig();
     end
