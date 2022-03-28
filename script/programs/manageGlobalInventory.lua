@@ -180,6 +180,9 @@ function EnsureProtectionSlotsFilled(providerChest, protectionUnitInput)
     end
 
     local allSlots = providerChest.list();
+    if not allSlots then
+        return;
+    end
     for i = constants.INVENTORY_SLOTS.SUCC_PROTECTION_SLOT_BEGIN, constants.INVENTORY_SLOTS.SUCC_PROTECTION_SLOT_END do
         if not allSlots[i] then
             -- if nothing in the slot, put something there
@@ -195,6 +198,9 @@ function EmptyExtraToComposite(providerChest, compositeOutput)
     -- unlabeled slots in provider nodes are sucked into output nodes
 
     local allSlots = providerChest.list();
+    if not allSlots then
+        return;
+    end
 
     for invSlot, data in pairs(allSlots) do
         if invSlot <= constants.INVENTORY_SLOTS.FUEL_MAX_SLOT and data.count > 0 and not ValidFuel[data.name] then
