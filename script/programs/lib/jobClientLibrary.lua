@@ -50,7 +50,12 @@ local function ExecuteCommands(commands, timeRemainingCallback)
     while table.maxn(commands) >= 1 do
         local command = commands[1];
         LogInfo("running command: " ..command.description);
-        command.ex();
+        local status, resp = pcall(command.ex);
+        if not status then
+            LogInfo("error when executing job");
+            LogInfo(resp);
+            error(resp);
+        end
         table.remove(commands, 1);
         timeRemainingCallback(GetCommandCost(commands));
     end
@@ -75,8 +80,9 @@ local function RunGeneratorFunctionCommandsAsJob(genFn)
 
     -- ensure sufficient fuel to complete the operation and/or has available fuel source
     local requiredFuel = reaminingTimeOfJob * 2;
-    if not turtleMesh.EnsureMinimumFuelRequirementMet(requiredFuel) then
-        print("insufficient fuel to complete operation. need at least " .. tostring(requiredFuel));
+    local success, fuelSuccess = pcall(function() turtleMesh.EnsureMinimumFuelRequirementMet(requiredFuel) end)
+    if not success or not fuelSuccess then
+        LogInfo("insufficient fuel to complete operation. need at least " .. tostring(requiredFuel));
         return false;
     end
     ExecuteCommands(jobCommands, updateTimeRemaing);

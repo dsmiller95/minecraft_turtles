@@ -29,6 +29,9 @@ end
 local function GetChunkStatusFromServer(x, z)
     rednetHelpers.EnsureModemOpen();
     local chunkServer = rednet.lookup("CHUNKREQ", "chunkServer");
+    if not chunkServer then
+        error("chunk server not found")
+    end
     local req = "status (" .. tostring(x) .. ", " .. tostring(z) .. ")";
     rednet.send(chunkServer, req, "CHUNKREQ");
     local id, msg = rednet.receive("CHUNKRESP");

@@ -24,6 +24,7 @@ local function ValidatePredictedPosition()
     local actualPosition = vector.new(gps.locate());
     if not actualPosition or not actualPosition.x then
         print("warning: actual position found via gps was nil");
+        os.sleep(0.5);
         return;
     end
     if currentPosition ~= actualPosition then

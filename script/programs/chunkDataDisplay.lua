@@ -167,14 +167,19 @@ local function UpdateChunksAndAdjacentChunks(monitor)
         for x = 1, chunkWidth do
             local chunkX, chunkZ = ScreenPosToChunk(x, z);
             if ShouldUpdateChunk(chunkX, chunkZ) then
-                local newStatus = mesh.GetChunkStatusFromServer(chunkX, chunkZ);
-                local newChunk = {
-                    x = chunkX,
-                    z = chunkZ,
-                    status = newStatus
-                };
-                WriteChunkData(newChunk);
-                DrawSingleChunk(monitor, x, z);
+                local success, result = pcall(function() mesh.GetChunkStatusFromServer(chunkX, chunkZ) end);
+                if success then
+                    local newChunk = {
+                        x = chunkX,
+                        z = chunkZ,
+                        status = result
+                    };
+                    WriteChunkData(newChunk);
+                    DrawSingleChunk(monitor, x, z); 
+                else
+                    print(result);
+                    break;
+                end
             end
         end
     end
