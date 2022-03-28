@@ -117,7 +117,7 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
         local pulledItems = self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
         pullCount = pullCount - pulledItems;
         if pulledItems > 0 then
-            LogMessage("consuming " .. tostring(pulledItems) .. " of " .. itemType .. ". " .. tostring(pullCount) .. " remaining"); 
+            LogMessage(string.format("input  %03i %-30s", pulledItems, itemType));
         end
         if pulledItems <= 0 then
             -- force next slot. if the item can't be pulled in that means the stack must be full or incompatible
@@ -145,7 +145,7 @@ function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlo
         local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, actualAmount, targetInventorySlot);
         pushCount = pushCount - pushedItems;
         if pushedItems > 0 then
-            LogMessage("provided " .. tostring(pushedItems) .. " of " .. itemType .. ". " .. tostring(pushCount) .. " remaining");
+            LogMessage(string.format("output %03i %-30s", pushedItems, itemType));
         end
         if pushedItems <= 0 then
             -- if we can't push, means that something in the target inv is blocking
