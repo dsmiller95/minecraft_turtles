@@ -88,14 +88,14 @@ local function AllocateJob(claimantId, msg)
     local newestJob = os.epoch("utc") - 30 * 1000;
     local firstAvialableJobIndex = indexOf(allJobs,
         function(job)
-            if not job.claimedComputerId then
-                if job.lastUpdateFromClaimant and job.lastUpdateFromClaimant > newestJob then
-                    -- reject if job has been updated recently. likely has been rejected.
-                    return false;
-                end
-                return true;
+            if job.claimedComputerId then
+                return false;
             end
-            return false;
+            if job.lastUpdateFromClaimant and job.lastUpdateFromClaimant > newestJob then
+                -- reject if job has been updated recently. likely has been rejected.
+                return false;
+            end
+            return true;
         end);
     if not firstAvialableJobIndex then
         rednet.send(claimantId, "INVALID: No Jobs", "JOBACK");

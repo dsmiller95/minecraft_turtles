@@ -237,6 +237,7 @@ local function DetermineDirectionality()
     end
     MoveForwardDigIfNeeded();
     MoveBack();
+    return true;
 end
 
 local function MoveToTransverse(desiredPosition)
