@@ -140,8 +140,23 @@ local function QueueJobs()
             end
             local newJob = Job:new(command);
             table.insert(allJobs, newJob);
+        elseif string.find(msg, "cancel ") == 1 then
+            local s, e, index = string.find(msg, "cancel (%d+)");
+            if not s then
+                print("invalid cancel comannd. syntax: 'cancel <index>'");
+            end
+            index = tonumber(index);
+            if index > table.maxn(allJobs) or index < 1 then
+                print("job index out of range, must between 1 and " ..table.maxn(allJobs) .. " inclusive");
+            else
+                local job = allJobs[index];
+                if job.claimedComputerId and job.status ~= "ABANDONED" then
+                    print("WARNING! cancelled job with pending work");
+                end
+                table.remove(allJobs, index);
+            end
         else
-            print("usage: 'ls' or 'queue'");
+            print("usage: 'ls', 'queue', or 'cancel'");
         end
     end
 end
