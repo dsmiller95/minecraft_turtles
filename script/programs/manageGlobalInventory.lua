@@ -68,16 +68,18 @@ end
 
 
 -- pull items into this composite
-function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlot)
+function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlot, itemType)
     if not self.isSink then
         error("cannot pull into source inventory");
     end
     if self:isComplete() then
         return 0;
     end
+    itemType = itemType or "junk";
     while pullCount > 0 do
         local pulledItems = self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
         pullCount = pullCount - pulledItems;
+        print("consuming " .. tostring(pulledItems) .. " of " .. itemType .. ". " .. tostring(pullCount) .. " remaining");
         if pulledItems <= 0 then
             -- force next slot. if the item can't be pulled in that means the stack must be full or incompatible
             self.currentSlot = self.currentSlot + 1;
@@ -90,18 +92,24 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
 end
 
 -- push items from this composite
-function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlot)
+function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlot, itemType)
     if self.isSink then
         error("cannot push from sink inventory");
     end
     if self:isComplete() then
         return 0;
     end
+    itemType = itemType or "junk";
     while pushCount > 0 do
         -- never take more than 1 minus the available items
         local actualAmount = math.min(self:CurrentItemCount() - 1, pushCount);
         local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, actualAmount, targetInventorySlot);
         pushCount = pushCount - pushedItems;
+        print("provided " .. tostring(pushedItems) .. " of " .. itemType .. ". " .. tostring(pushCount) .. " remaining");
+        if pushedItems <= 0 then
+            -- if we can't push, means that something in the target inv is blocking
+            return pushCount;
+        end
         if not self:updateActiveSlot() then
             return pushCount;
         end
@@ -150,14 +158,14 @@ function EmptyExtraToComposite(providerChest, compositeOutput)
     for invSlot, data in pairs(allSlots) do
         if invSlot <= constants.INVENTORY_SLOTS.FUEL_MAX_SLOT and data.count > 0 and not ValidFuel[data.name] then
             -- non-fuel in a fuel slot
-            compositeOutput:pullN(data.count, providerChest, invSlot);
+            compositeOutput:pullN(data.count, providerChest, invSlot, data.name);
             if compositeOutput:isComplete() then
                 return;
             end
         end
         if invSlot > constants.INVENTORY_SLOTS.FUEL_MAX_SLOT and invSlot < constants.INVENTORY_SLOTS.SUCC_PROTECTION_SLOT_BEGIN and data.count > 0 then
             -- something in a non-fuel non-data
-            compositeOutput:pullN(data.count, providerChest, invSlot);
+            compositeOutput:pullN(data.count, providerChest, invSlot, data.name);
             if compositeOutput:isComplete() then
                 return;
             end
@@ -172,7 +180,7 @@ function FillFuelSlot(providerChest, fuelSource)
     local targetInvSlot = 1;
     local currentCount = GetItemCount(providerChest, targetInvSlot);
     local maxCount = providerChest.getItemLimit(targetInvSlot);
-    fuelSource:pushN(maxCount - currentCount, providerChest, targetInvSlot);
+    fuelSource:pushN(maxCount - currentCount, providerChest, targetInvSlot, "fuel");
 end
 
 
