@@ -8,8 +8,8 @@ return {
         "lib/fuelingTools", "lib/buildingTools", "lib/itemGridAccess",
         "lib/inventoryTools", "lib/positionProvider", "lib/turtleMesh", "lib/turtleMeshConstants",
         "lib/rednetHelpers", "lib/generatorTools",
-        "jobs/deployServiceGrid", "jobs/dummyJob", "jobs/quarryServiceGridLayers", "job/moveToJob",
+        "jobs/deployServiceGrid", "jobs/dummyJob", "jobs/quarryServiceGridLayers", "jobs/moveToJob",
         "chunkDataDisplay", "lib/redstoneTools"
     },
-    version = "0.0.156"
+    version = "0.0.157"
 };
