@@ -80,7 +80,7 @@ local function RunGeneratorFunctionCommandsAsJob(genFn)
 
     -- ensure sufficient fuel to complete the operation and/or has available fuel source
     local requiredFuel = reaminingTimeOfJob * 2;
-    local success, fuelSuccess = pcall(function() turtleMesh.EnsureMinimumFuelRequirementMet(requiredFuel) end)
+    local success, fuelSuccess = pcall(function() return turtleMesh.EnsureMinimumFuelRequirementMet(requiredFuel) end)
     if not success or not fuelSuccess then
         LogInfo("insufficient fuel to complete operation. need at least " .. tostring(requiredFuel));
         return false;
