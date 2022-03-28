@@ -45,7 +45,7 @@ function LogMessage(msg)
             monitor.scroll(1);
             y = y - 1;
         end
-        monitor.setCursorPos(x, y);
+        monitor.setCursorPos(1, y);
         monitor.write(msg);
     end
 end
