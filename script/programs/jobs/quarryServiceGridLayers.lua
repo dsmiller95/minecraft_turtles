@@ -16,6 +16,7 @@ local function GenerateMoveChunkCommands(initialPosition)
     local target = GetTargetInChunk();
     
     position.NavigateToPositionAsCommand(initialPosition, target);
+    return target;
 end
     -- excavate layers at some height. perhaps bottom of the map.
 
