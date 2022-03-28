@@ -29,6 +29,9 @@ CompositeInventory = {inventories = nil, currentSlot = nil, activeInventoryIndex
 
 
 local monitor = peripheral.find("monitor");
+if monitor then
+   monitor.setTextScale(0.5);
+end
 function LogMessage(msg)
     print(msg);
     if monitor then
