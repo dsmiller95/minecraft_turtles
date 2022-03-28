@@ -35,64 +35,53 @@ local function DeposItemsIfNeeded()
     });
 end
 
-local function DigCell(initialPos, targetPos, width, height, nudgeNavigate)
+local function DigCell(initialPos, targetPos, width, length, nudgeNavigate, digup, digdown)
     position.NavigateToPositionAsCommand(initialPos, targetPos, targetPos.y, {nudge=nudgeNavigate});
     coroutine.yield({
         ex = function ()
-            buildingTools.ExcavateLayer(width, height, true, true, vector.new(1, 0, 0));
+            buildingTools.ExcavateLayer(width, length, digup, digdown, vector.new(1, 0, 0));
         end,
-        cost = width * height + width,
-        description = "excavate "..width.."x"..height.."x3 at " .. targetPos:tostring(),
+        cost = width * length + width,
+        description = "excavate "..width.."x"..length.."x3 at " .. targetPos:tostring(),
     });
     DeposItemsIfNeeded();
     return targetPos;
 end
 
-local function ExcavateUpToBottomOfMesh()
-    local defaultDigDirection = vector.new(1, 0, 0);
+local function ExcavateUpToBottomOfMesh(initialPosition)
     local baseLayersToDig = constants.MESH_LAYER_MIN - constants.QUARRY_MIN;
-    local fullLayersToDig = math.floor(baseLayersToDig / 3);
-    for i = 0, fullLayersToDig - 1 do
-        local target = GetTargetInChunk();
-        target.y = target.y + i * 3 + 1;
-        local initial = target;
-        initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8)
-        initial = DigCell(initial, target + vector.new(8, 0, 0), 8, 8)
-        initial = DigCell(initial, target + vector.new(8, 0, 8), 8, 8)
-        initial = DigCell(initial, target + vector.new(0, 0, 8), 8, 8)
-    end
     local extraLayers = baseLayersToDig % 3;
-    if extraLayers == 1 then
-        coroutine.yield({
-            ex = function ()
-                buildingTools.ExcavateLayer(16, 16, false, false, defaultDigDirection);
-                position.upWithDig();
-            end,
-            cost = 16 * 16 + 16,
-            description = "excavate base chunk layer of depth 1",
-        });
-    elseif extraLayers == 2 then
-        coroutine.yield({
-            ex = function ()
-                position.upWithDig();
-                buildingTools.ExcavateLayer(16, 16, false, true, defaultDigDirection);
-                position.upWithDig();
-            end,
-            cost = 16 * 16 + 16,
-            description = "excavate base chunk layer of depth 1",
-        });
+    if extraLayers == 0 then extraLayers = 3; end
+
+    local target = initialPosition;
+    local initial = initialPosition;
+
+    for layerDepth = extraLayers, baseLayersToDig, 3 do
+        target = GetTargetInChunk();
+        -- target is at the bottom of this layer chunk
+        target.y = target.y + baseLayersToDig - layerDepth;
+        local digUp = layerDepth > 1;
+        local digDown = layerDepth > 2;
+        if digDown then
+            target.y = target.y + 1;
+        end
+        initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8, false, digUp, digDown)
+        initial = DigCell(initial, target + vector.new(8, 0, 0), 8, 8, false, digUp, digDown)
+        initial = DigCell(initial, target + vector.new(8, 0, 8), 8, 8, false, digUp, digDown)
+        initial = DigCell(initial, target + vector.new(0, 0, 8), 8, 8, false, digUp, digDown)
     end
-    DeposItemsIfNeeded();
+    return initial;
 end
 
-local function ExcavateMeshGridExtraSpace()
+local function ExcavateMeshGridExtraSpace(initialPosition)
     local target = GetTargetInChunk();
     target.y = constants.MESH_LAYER_MIN + 1;
-    local initial = target;
-    initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8, true)
-    initial = DigCell(initial, target + vector.new(9, 0, 0), 8, 7, true)
-    initial = DigCell(initial, target + vector.new(9, 0, 9), 7, 7, true)
-    initial = DigCell(initial, target + vector.new(0, 0, 9), 7, 8, true)
+    local initial = initialPosition;
+    initial = DigCell(initial, target + vector.new(0, 0, 0), 8, 8, true, true, true)
+    initial = DigCell(initial, target + vector.new(9, 0, 0), 8, 7, true, true, true)
+    initial = DigCell(initial, target + vector.new(9, 0, 9), 7, 7, true, true, true)
+    initial = DigCell(initial, target + vector.new(0, 0, 9), 7, 8, true, true, true)
+    return initial;
 end
 
 local function WrapUp()
@@ -113,19 +102,20 @@ local function WrapUp()
     });
 end
 
-local function ExcavateChunkAreaCommands()
-    ExcavateUpToBottomOfMesh();
-    ExcavateMeshGridExtraSpace();
+local function ExcavateChunkAreaCommands(initial)
+    initial = ExcavateMeshGridExtraSpace(initial);
+    initial = ExcavateUpToBottomOfMesh(initial);
     WrapUp();
+    return initial;
 end
     -- place grid of cable inside the chunk
 
 local function GenerateCommands()
     local initial = position.Position()
     print("getting chunk commands");
-    GenerateMoveChunkCommands(initial);
+    initial = GenerateMoveChunkCommands(initial);
     print("getting mining commands");
-    ExcavateChunkAreaCommands();
+    initial = ExcavateChunkAreaCommands(initial);
 end
     -- alert the player to activate the modem
     -- report job done to job server
