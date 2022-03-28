@@ -53,6 +53,7 @@ local colorsByChunkStats = {
     [consts.CHUNK_STATUS.MESH_QUARRIED] = colors.blue;
     [consts.CHUNK_STATUS.COMPLETELY_MINED] = colors.white;
 }
+local unknownChunkStatus = colors.magenta;
 
 local function CenterOfScreen()
     local centerX, centerZ = math.floor(chunkWidth/2), math.floor(chunkHeight/2);
@@ -97,7 +98,7 @@ local function DrawSingleChunk(monitor, x, z)
     else
         status = chunk.status;
     end
-    local color = colorsByChunkStats[status];
+    local color = colorsByChunkStats[status] or unknownChunkStatus;
     monitor.setBackgroundColor(color);
     monitor.write(tostring(status));
 end
