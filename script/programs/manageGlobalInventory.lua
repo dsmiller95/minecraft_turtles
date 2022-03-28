@@ -43,11 +43,25 @@ function LogMessage(msg)
         y = y + 1;
         if y > height then
             monitor.scroll(1);
+            WriteStatus();
             y = y - 1;
         end
         monitor.setCursorPos(1, y);
         monitor.write(msg);
     end
+end
+local currentStatus = nil;
+function WriteStatus(msg)
+    if msg then
+        print(msg);
+    end
+    msg = msg or currentStatus;
+    currentStatus = msg;
+    local x, y = monitor.getCursorPos();
+    monitor.setCursorPos(1, 1);
+    monitor.clearLine();
+    monitor.write(msg);
+    monitor.setCursorPos(x, y);
 end
 
 function GetItemCount(inventory, slotNum)
@@ -102,7 +116,9 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
     while pullCount > 0 do
         local pulledItems = self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
         pullCount = pullCount - pulledItems;
-        LogMessage("consuming " .. tostring(pulledItems) .. " of " .. itemType .. ". " .. tostring(pullCount) .. " remaining");
+        if pulledItems > 0 then
+            LogMessage("consuming " .. tostring(pulledItems) .. " of " .. itemType .. ". " .. tostring(pullCount) .. " remaining"); 
+        end
         if pulledItems <= 0 then
             -- force next slot. if the item can't be pulled in that means the stack must be full or incompatible
             self.currentSlot = self.currentSlot + 1;
@@ -128,7 +144,9 @@ function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlo
         local actualAmount = math.min(self:CurrentItemCount() - 1, pushCount);
         local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, actualAmount, targetInventorySlot);
         pushCount = pushCount - pushedItems;
-        LogMessage("provided " .. tostring(pushedItems) .. " of " .. itemType .. ". " .. tostring(pushCount) .. " remaining");
+        if pushedItems > 0 then
+            LogMessage("provided " .. tostring(pushedItems) .. " of " .. itemType .. ". " .. tostring(pushCount) .. " remaining");
+        end
         if pushedItems <= 0 then
             -- if we can't push, means that something in the target inv is blocking
             return pushCount;
@@ -244,7 +262,7 @@ function DistributeInventory()
         end
     end
 
-    LogMessage("found " .. 
+    WriteStatus("found " .. 
             table.maxn(providerNodes) .. " provider nodes, " .. 
             table.maxn(outputNodes) .. " output nodes");
 
