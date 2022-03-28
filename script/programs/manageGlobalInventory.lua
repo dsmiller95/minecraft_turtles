@@ -27,6 +27,23 @@ CompositeInventory = {inventories = nil, currentSlot = nil, activeInventoryIndex
 
 -- Derived class method new
 
+
+local monitor = peripheral.find("monitor");
+function LogMessage(msg)
+    print(msg);
+    if monitor then
+        local x, y = monitor.getCursorPos();
+        local width, height = monitor.getSize();
+        y = y + 1;
+        if y > height then
+            monitor.scroll(1);
+            y = y - 1;
+        end
+        monitor.setCursorPos(x, y);
+        monitor.write(msg);
+    end
+end
+
 function GetItemCount(inventory, slotNum)
     local details = inventory.getItemDetail(slotNum);
     if not details then
@@ -79,7 +96,7 @@ function CompositeInventory:pullN(pullCount, targetInventory, targetInventorySlo
     while pullCount > 0 do
         local pulledItems = self:ActiveInventory().pullItems(peripheral.getName(targetInventory), targetInventorySlot, pullCount, self.currentSlot);
         pullCount = pullCount - pulledItems;
-        print("consuming " .. tostring(pulledItems) .. " of " .. itemType .. ". " .. tostring(pullCount) .. " remaining");
+        LogMessage("consuming " .. tostring(pulledItems) .. " of " .. itemType .. ". " .. tostring(pullCount) .. " remaining");
         if pulledItems <= 0 then
             -- force next slot. if the item can't be pulled in that means the stack must be full or incompatible
             self.currentSlot = self.currentSlot + 1;
@@ -105,7 +122,7 @@ function CompositeInventory:pushN(pushCount, targetInventory, targetInventorySlo
         local actualAmount = math.min(self:CurrentItemCount() - 1, pushCount);
         local pushedItems = self:ActiveInventory().pushItems(peripheral.getName(targetInventory), self.currentSlot, actualAmount, targetInventorySlot);
         pushCount = pushCount - pushedItems;
-        print("provided " .. tostring(pushedItems) .. " of " .. itemType .. ". " .. tostring(pushCount) .. " remaining");
+        LogMessage("provided " .. tostring(pushedItems) .. " of " .. itemType .. ". " .. tostring(pushCount) .. " remaining");
         if pushedItems <= 0 then
             -- if we can't push, means that something in the target inv is blocking
             return pushCount;
@@ -221,20 +238,20 @@ function DistributeInventory()
         end
     end
 
-    print("found " .. 
+    LogMessage("found " .. 
             table.maxn(providerNodes) .. " provider nodes, " .. 
             table.maxn(outputNodes) .. " output nodes");
 
     local cobbleSource = CompositeInventory:new(nil, inputInventoriesByType["minecraft:cobblestone"], false);
     if cobbleSource:isComplete() then
-        print("error: no cobbles?");
+        LogMessage("error: no cobbles?");
         return;
     end
     local fuelSource = CompositeInventory:new(nil, inputInventoriesByType["minecraft:coal"], false)
     if fuelSource:isComplete() then
         fuelSource = CompositeInventory:new(nil, inputInventoriesByType["minecraft:charcoal"], false)
         if fuelSource:isComplete() then
-            print("error: no fuels?"); 
+            LogMessage("error: no fuels?"); 
             return;
         end
     end
