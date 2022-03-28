@@ -26,8 +26,21 @@ local function indexOf(array, matchFn)
     return nil
 end
 
-local function SortJobs()
-
+-- abandon after 5 minutes
+local abandonTime = 5 * 60 * 1000;
+local function MaintainJobs()
+    while true do
+        local updateTime = os.epoch("utc");
+        for _, job in pairs(allJobs) do
+            local claimEpoch = job.lastUpdateFromClaimant or 0;
+            local diff = updateTime - claimEpoch;
+            if diff > abandonTime then
+                job.claimedComputerId = nil;
+                job.status = "ABANDONED";
+            end
+        end
+        os.sleep(20);
+    end
 end
 
 local function PeriodicAnnounce()
@@ -174,4 +187,9 @@ end
 
 local modemName = peripheral.getName(peripheral.find("modem"));
 rednet.open(modemName);
-parallel.waitForAll(PeriodicAnnounce, ServeJobs, QueueJobs, WriteJobsToMonitor)
+parallel.waitForAll(
+    PeriodicAnnounce,
+    ServeJobs,
+    QueueJobs,
+    WriteJobsToMonitor,
+    MaintainJobs)

@@ -22,6 +22,10 @@ local function ValidatePredictedPosition()
         return;
     end
     local actualPosition = vector.new(gps.locate());
+    if not actualPosition or not actualPosition.x then
+        print("warning: actual position found via gps was nil");
+        return;
+    end
     if currentPosition ~= actualPosition then
         error("mismatch in position. Expected to be at (" .. currentPosition:tostring()  .. ") but was actually at (" .. actualPosition:tostring() .. ")");
     end
