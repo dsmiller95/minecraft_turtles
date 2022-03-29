@@ -5,6 +5,7 @@ return {
     QUARRY_MIN = 5,
     MESH_LAYER_MIN = 11,
     MESH_LAYER_MAX = 14,
+    QUARRY_TOP = 14 + 22 * 3, -- 80. multiple of 3 above quarry top
     INVENTORY_SLOTS = {
         -- inventory up to 10 is reserved for fuel
         -- data slot 1 and 2 are for flags
@@ -18,6 +19,6 @@ return {
         WILDERNESS = 0,
         FUELED = 1,
         MESH_QUARRIED=2,
-        COMPLETELY_MINED = 20
+        COMPLETELY_MINED = 24
     }
 }

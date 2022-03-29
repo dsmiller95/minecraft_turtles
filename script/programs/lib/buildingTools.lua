@@ -86,5 +86,5 @@ return {
     PlaceBlockFromSlotSafeDown=PlaceBlockFromSlotSafeDown,
     PlaceBlockFromSlotSafeUp= PlaceBlockFromSlotSafeUp,
     ExcavateLayer=ExcavateLayer,
-    ExcavateLayerAsCommand=ExcavateLayerAsCommand,
+    ExcavateLayerAsCommand=ExcavateLayerAsCommand
 }
