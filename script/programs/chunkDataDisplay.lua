@@ -268,8 +268,16 @@ end
 
 local function WatchForGpsChanges(redirect)
     while true do
-        SetCenterToPosition();
-        os.sleep(1);
+        local nextPos = vector.new(gps.locate());
+        if nextPos.x == nextPos.x then
+            local chunkX, chunkZ = mesh.GetChunkFromPosition(nextPos);
+            if chunkX ~= centerChunk.x and chunkZ ~= centerChunk.z then
+                centerChunk.x = chunkX;
+                centerChunk.z = chunkZ;
+                DrawChunkStates(redirect);
+            end 
+        end
+        os.sleep(0.2);
     end
 end
 
