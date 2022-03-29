@@ -271,7 +271,7 @@ local function WatchForGpsChanges(redirect)
         local nextPos = vector.new(gps.locate());
         if nextPos.x == nextPos.x then
             local chunkX, chunkZ = mesh.GetChunkFromPosition(nextPos);
-            if chunkX ~= centerChunk.x and chunkZ ~= centerChunk.z then
+            if chunkX ~= centerChunk.x or chunkZ ~= centerChunk.z then
                 centerChunk.x = chunkX;
                 centerChunk.z = chunkZ;
                 DrawChunkStates(redirect);
