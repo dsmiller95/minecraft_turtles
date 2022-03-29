@@ -82,14 +82,14 @@ local function ScreenPosToChunk(x, z)
     return x - centerX + centerChunk.x, z - centerZ + centerChunk.z;
 end
 
-local function FocusCenterScreenPos(monitor)
+local function FocusCenterScreenPos(redirect)
     local centerX, centerZ = CenterOfScreen()
-    monitor.setCursorPos(centerX * 2, centerZ);
-    monitor.setCursorBlink(true);
+    redirect.setCursorPos(centerX * 2, centerZ);
+    redirect.setCursorBlink(true);
 end
 
-local function InitializeChunkTable(monitor)
-    chunkWidth, chunkHeight = monitor.getSize();
+local function InitializeChunkTable(redirect)
+    chunkWidth, chunkHeight = redirect.getSize();
     chunkWidth = math.floor(chunkWidth / 2);
     chunkHeight = chunkHeight - 1;
     chunkTable = {};
@@ -105,8 +105,8 @@ local function InitializeChunkTable(monitor)
     end
 end
 
-local function DrawSingleChunk(monitor, x, z)
-    monitor.setCursorPos(((x - 1) * 2) + 1, z);
+local function DrawSingleChunk(redirect, x, z)
+    redirect.setCursorPos(((x - 1) * 2) + 1, z);
     local chunk = GetChunkData(ScreenPosToChunk(x, z));
     local status;
     if not chunk then
@@ -115,26 +115,26 @@ local function DrawSingleChunk(monitor, x, z)
         status = chunk.status;
     end
     local color = colorsByChunkStats[status] or unknownChunkStatus;
-    monitor.setBackgroundColor(color);
-    monitor.write(string.format("%2i", status));
+    redirect.setBackgroundColor(color);
+    redirect.write(string.format("%2i", status));
 end
 
-local function DrawFooterInfo(monitor)
-    monitor.setCursorPos(1, chunkHeight + 1);
-    monitor.setBackgroundColor(colors.magenta);
-    monitor.write(tostring(centerChunk.x) .. "," .. tostring    (centerChunk.z));
+local function DrawFooterInfo(redirect)
+    redirect.setCursorPos(1, chunkHeight + 1);
+    redirect.setBackgroundColor(colors.magenta);
+    redirect.write(tostring(centerChunk.x) .. "," .. tostring    (centerChunk.z));
     local jobs = GetJobsAtChunk(centerChunk.x, centerChunk.z);
-    monitor.write(" " .. table.maxn(jobs) .. "jobs");
+    redirect.write(" " .. table.maxn(jobs) .. "jobs");
 end
 
-local function DrawChunkStates(monitor)
+local function DrawChunkStates(redirect)
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
-            DrawSingleChunk(monitor, x, z);
+            DrawSingleChunk(redirect, x, z);
         end
     end
-    DrawFooterInfo(monitor);
-    FocusCenterScreenPos(monitor);
+    DrawFooterInfo(redirect);
+    FocusCenterScreenPos(redirect);
 end
 
 local lastCableState = {
@@ -181,7 +181,7 @@ local function ShouldUpdateChunk(x, z)
     return false;
 end
 
-local function UpdateChunksAndAdjacentChunks(monitor)
+local function UpdateChunksAndAdjacentChunks(redirect)
     for z = 1, chunkHeight do
         for x = 1, chunkWidth do
             local chunkX, chunkZ = ScreenPosToChunk(x, z);
@@ -194,9 +194,11 @@ local function UpdateChunksAndAdjacentChunks(monitor)
                         status = result
                     };
                     WriteChunkData(newChunk);
-                    DrawSingleChunk(monitor, x, z); 
+                    DrawSingleChunk(redirect, x, z); 
                 else
-                    print(result);
+                    if not pocket then
+                        print(result);
+                    end
                     break;
                 end
             end
@@ -204,25 +206,23 @@ local function UpdateChunksAndAdjacentChunks(monitor)
     end
 end
 
-local monitor = peripheral.find("monitor");
-monitor.setTextScale(4);
-local function UpdateAllChunksPeriodically()
+local function UpdateAllChunksPeriodically(redirect)
     while true do
-        UpdateChunksAndAdjacentChunks(monitor);
-        FocusCenterScreenPos(monitor);
+        UpdateChunksAndAdjacentChunks(redirect);
+        FocusCenterScreenPos(redirect);
         os.sleep(10);
     end
 end
 
 
-local function HandleDirectionButtonPress(directionButton)
+local function HandleDirectionButtonPress(directionButton, redirect)
     if directionButton == "activate" then
         -- allow for 5, dissalow 0
-        local scale = (monitor.getTextScale() % 5) + 0.5;
+        local scale = (redirect.getTextScale() % 5) + 0.5;
         scale = scale.max(1, scale);
-        monitor.setTextScale(scale);
-        InitializeChunkTable(monitor);
-        UpdateChunksAndAdjacentChunks(monitor);
+        redirect.setTextScale(scale);
+        InitializeChunkTable(redirect);
+        UpdateChunksAndAdjacentChunks(redirect);
     else
         print(directionButton);
         local moveDir = nil;
@@ -238,14 +238,14 @@ local function HandleDirectionButtonPress(directionButton)
         centerChunk.x = centerChunk.x + moveDir.x;
         centerChunk.z = centerChunk.z + moveDir.z;
     end
-    DrawChunkStates(monitor);
+    DrawChunkStates(redirect);
 end
-local function WatchForRedstoneChangeEvents()
+local function WatchForRedstoneChangeEvents(redirect)
     while true do
         local nextStates = GetCableState();
         for name, value in pairs(nextStates) do
             if value and not lastCableState[name] then
-                HandleDirectionButtonPress(name);
+                HandleDirectionButtonPress(name, redirect);
             end
         end
         lastCableState = nextStates;
@@ -253,10 +253,35 @@ local function WatchForRedstoneChangeEvents()
     end
 end
 
-InitializeChunkTable(monitor);
-DrawChunkStates(monitor);
+local function WatchForGpsChanges(redirect)
+    while true do
+        local nextPos = vector.new(gps.locate());
+        local chunkX, chunkZ = mesh.GetChunkFromPosition(nextPos);
+        centerChunk.x = chunkX;
+        centerChunk.z = chunkZ;
+        DrawChunkStates(redirect);
+        os.sleep(0.5);
+    end
+end
 
-parallel.waitForAny(
-    WatchForRedstoneChangeEvents,
-    UpdateAllChunksPeriodically
-)
+
+local monitor = peripheral.find("monitor");
+local redirect = term.current();
+if monitor then
+    monitor.setTextScale(4); 
+    redirect = monitor;
+end
+InitializeChunkTable(redirect);
+DrawChunkStates(redirect);
+
+if pocket then
+    parallel.waitForAny(
+        function() WatchForGpsChanges(redirect) end,
+        function() UpdateAllChunksPeriodically(redirect) end
+    )
+else
+    parallel.waitForAny(
+        function() WatchForRedstoneChangeEvents(redirect) end,
+            function() UpdateAllChunksPeriodically(redirect) end
+    )
+end
