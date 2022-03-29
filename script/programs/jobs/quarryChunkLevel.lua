@@ -96,9 +96,9 @@ end
 
 
 local function Execute(chunkX, chunkZ, layerId)
-    targetChunkX = chunkX;
-    targetChunkZ = chunkZ;
-    targetLevel = layerId;
+    targetChunkX = tonumber(chunkX);
+    targetChunkZ = tonumber(chunkZ);
+    targetLevel = tonumber(layerId);
     if targetLevel < 0 then
         error("target level below 0")
     elseif GetTargetY() <= constants.MESH_LAYER_MAX then

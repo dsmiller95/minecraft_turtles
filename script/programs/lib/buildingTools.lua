@@ -78,7 +78,7 @@ local function ExcavateLayerAsCommand(width, length, digUp, digDown, direction)
             ExcavateLayer(width, length, digUp, digDown, direction);
         end,
         cost = width * length + length,
-        description = "excavate "..width.."by"..length.." pointing at "..direction,
+        description = "excavate "..width.."by"..length.." pointing at "..direction:tostring(),
     });
 end
 

@@ -11,5 +11,5 @@ return {
         "jobs/deployServiceGrid", "jobs/dummyJob", "jobs/quarryServiceGridLayers", "jobs/moveToJob", "jobs/quarryChunkLevel",
         "chunkDataDisplay", "lib/redstoneTools"
     },
-    version = "0.0.172"
+    version = "0.0.173"
 };
