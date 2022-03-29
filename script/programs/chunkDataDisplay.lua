@@ -27,6 +27,16 @@ local centerChunk = {
     x = chunkX,
     z = chunkZ
 };
+local function SetCenterToPosition()
+    local nextPos = vector.new(gps.locate());
+    local chunkX, chunkZ = mesh.GetChunkFromPosition(nextPos);
+    centerChunk.x = chunkX;
+    centerChunk.z = chunkZ;
+end
+
+if pocket then
+    SetCenterToPosition();
+end
 
 
 local chunkTable = {}
@@ -258,11 +268,7 @@ end
 
 local function WatchForGpsChanges(redirect)
     while true do
-        local nextPos = vector.new(gps.locate());
-        local chunkX, chunkZ = mesh.GetChunkFromPosition(nextPos);
-        centerChunk.x = chunkX;
-        centerChunk.z = chunkZ;
-        DrawChunkStates(redirect);
+        SetCenterToPosition();
         os.sleep(1);
     end
 end
