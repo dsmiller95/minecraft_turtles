@@ -18,7 +18,7 @@ local chunkZ = arg[3];
 local centerOffsetX = arg[4] or 0;
 local centerOffsetZ = arg[5] or 0;
 
-if not redstoneSide or not chunkX or not chunkZ then
+if not pocket and (not redstoneSide or not chunkX or not chunkZ) then
     print("usage: 'chunkDataDisplay <redstone side> <chunk x> <chunk z>'");
     return;
 end
@@ -123,10 +123,10 @@ local function DrawSingleChunk(redirect, x, z)
 end
 
 local function DrawFooterInfo(redirect)
+    local jobs = GetJobsAtChunk(centerChunk.x, centerChunk.z);
     redirect.setCursorPos(1, chunkHeight + 1);
     redirect.setBackgroundColor(colors.magenta);
     redirect.write(tostring(centerChunk.x) .. "," .. tostring    (centerChunk.z));
-    local jobs = GetJobsAtChunk(centerChunk.x, centerChunk.z);
     redirect.write(" " .. table.maxn(jobs) .. "jobs");
 end
 
@@ -263,7 +263,7 @@ local function WatchForGpsChanges(redirect)
         centerChunk.x = chunkX;
         centerChunk.z = chunkZ;
         DrawChunkStates(redirect);
-        os.sleep(0.5);
+        os.sleep(1);
     end
 end
 
