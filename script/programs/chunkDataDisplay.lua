@@ -83,7 +83,7 @@ local function InitializeChunkTable(redirect)
     local chunkWidth, chunkHeight = redirect.getSize();
     chunkWidth = math.floor(chunkWidth / 2);
     chunkHeight = chunkHeight - 1;
-    local chunkCache = ChunkCache:new(chunkWidth, chunkHeight, nil, nil);
+    chunkCache = ChunkCache:new(chunkWidth, chunkHeight, nil, nil);
     local centerX, centerZ = CenterOfScreen();
     chunkCache.cacheRoot = {
         x = chunkX - centerX,
@@ -161,7 +161,7 @@ end
 local function ProtectedUpdateChunks(redirect)
     local success, error = pcall(
         function()
-            ChunkCache:UpdateChunksAndAdjacentChunks(function(x, z)
+            chunkCache:UpdateChunksAndAdjacentChunks(function(x, z)
                 DrawSingleChunk(redirect, x, z); 
             end)
         end);
