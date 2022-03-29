@@ -39,7 +39,7 @@ end
 local function GetJobsAtChunk(x, z)
     local jobServer = rednet.lookup("JOBQUEUE", "job queueing server");
     rednet.send(jobServer, "list", "JOBQUEUE");
-    local serialized = rednet.receive("JOBQUEUE");
+    local jobServer, serialized = rednet.receive("JOBQUEUE");
     local allJobs = textutils.unserialize(serialized);
     local filteredJobs = {};
     for _, jobCommand in pairs(allJobs) do
@@ -123,7 +123,7 @@ local function DrawFooterInfo(monitor)
     monitor.setCursorPos(1, chunkHeight + 1);
     monitor.setBackgroundColor(colors.magenta);
     monitor.write(tostring(centerChunk.x) .. "," .. tostring    (centerChunk.z));
-    local jobs = GetJobsAtChunk(centerChunk.x, centerChunk.y);
+    local jobs = GetJobsAtChunk(centerChunk.x, centerChunk.z);
     monitor.write(" " .. table.maxn(jobs) .. "jobs");
 end
 
