@@ -9,7 +9,7 @@ return {
         "lib/inventoryTools", "lib/positionProvider", "lib/turtleMesh", "lib/turtleMeshConstants",
         "lib/rednetHelpers", "lib/generatorTools",
         "jobs/deployServiceGrid", "jobs/dummyJob", "jobs/quarryServiceGridLayers", "jobs/moveToJob", "jobs/quarryChunkLevel",
-        "chunkDataDisplay", "lib/redstoneTools"
+        "chunkDataDisplay", "lib/redstoneTools", "lib/chunkDataCache"
     },
-    version = "0.0.184"
+    version = "0.0.185"
 };
