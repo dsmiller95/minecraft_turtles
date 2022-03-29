@@ -101,7 +101,7 @@ local function DrawSingleChunk(monitor, x, z)
     end
     local color = colorsByChunkStats[status] or unknownChunkStatus;
     monitor.setBackgroundColor(color);
-    monitor.write(string.format("%02i", status));
+    monitor.write(string.format("%2i", status));
 end
 
 local function DrawCenterPosition(monitor)
