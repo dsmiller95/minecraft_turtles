@@ -1,3 +1,5 @@
+local rednetHelpers = require("lib.rednetHelpers");
+
 local allJobs = {};
 
 -- Meta class
@@ -120,6 +122,52 @@ local function ServeJobs()
     end
 end
 
+local function ProcessQueue(queueMessage)
+    local s, e, command = string.find(queueMessage, "queue {(.*)}");
+    if not s then
+        print("invalid queue comannd. syntax: 'queue {JOBCOMMAND}'");
+        return false;
+    end
+    local newJob = Job:new(command);
+    table.insert(allJobs, newJob);
+    return true;
+end
+
+local function ProcessCancellation(cancelMessage)
+    local s, e, index = string.find(cancelMessage, "cancel (%d+)");
+    if not s then
+        print("invalid cancel comannd. syntax: 'cancel <index>'");
+        return false;
+    end
+    index = tonumber(index);
+    if index > table.maxn(allJobs) or index < 1 then
+        print("job index out of range, must between 1 and " ..table.maxn(allJobs) .. " inclusive");
+        return false;
+    end
+    local job = allJobs[index];
+    if job.claimedComputerId and job.status ~= "ABANDONED" then
+        print("WARNING! cancelled job with pending work");
+    end
+    table.remove(allJobs, index);
+    return true;
+end
+
+local function QueueNetworkJobs(senderId, message)
+    local result = false;
+    if string.find(message, "queue ") == 1 then
+        result = ProcessQueue(message);
+    elseif string.find(message, "cancel ") == 1 then
+        result = ProcessCancellation(message);
+    else
+        print("usage: 'ls', 'queue', or 'cancel'");
+    end
+    local msg = "REJECTED";
+    if result then
+        msg = "ACCEPTED";
+    end
+    rednet.send(senderId, msg, "JOBQUEUE");
+end
+
 local function QueueJobs()
     local history = { "ls", "queue" }
     while true do
@@ -134,27 +182,9 @@ local function QueueJobs()
                 print((job.claimedComputerId or "unclaimed") .. ":" .. job.status .. ":" .. job.command .. ":" .. claimTime .. ":" .. tostring(job.estimatedRemainingTime or 0));
             end
         elseif string.find(msg, "queue ") == 1 then
-            local s, e, command = string.find(msg, "queue {(.*)}");
-            if not s then
-                print("invalid queue comannd. syntax: 'queue {JOBCOMMAND}'");
-            end
-            local newJob = Job:new(command);
-            table.insert(allJobs, newJob);
+            ProcessQueue(msg);
         elseif string.find(msg, "cancel ") == 1 then
-            local s, e, index = string.find(msg, "cancel (%d+)");
-            if not s then
-                print("invalid cancel comannd. syntax: 'cancel <index>'");
-            end
-            index = tonumber(index);
-            if index > table.maxn(allJobs) or index < 1 then
-                print("job index out of range, must between 1 and " ..table.maxn(allJobs) .. " inclusive");
-            else
-                local job = allJobs[index];
-                if job.claimedComputerId and job.status ~= "ABANDONED" then
-                    print("WARNING! cancelled job with pending work");
-                end
-                table.remove(allJobs, index);
-            end
+            ProcessCancellation(msg);
         else
             print("usage: 'ls', 'queue', or 'cancel'");
         end
@@ -204,9 +234,11 @@ end
 
 local modemName = peripheral.getName(peripheral.find("modem"));
 rednet.open(modemName);
+rednet.host("JOBQUEUE", "job queueing server");
 parallel.waitForAll(
     PeriodicAnnounce,
     ServeJobs,
     QueueJobs,
     WriteJobsToMonitor,
-    MaintainJobs)
+    MaintainJobs,
+    rednetHelpers.ListenFor("JOBQUEUE", QueueNetworkJobs))
