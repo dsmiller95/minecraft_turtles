@@ -36,6 +36,21 @@ local function ToChunkName(x, z)
     return tostring(x) .. "," .. tostring(z);
 end
 
+local function GetJobsAtChunk(x, z)
+    local jobServer = rednet.lookup("JOBQUEUE", "job queueing server");
+    rednet.send(jobServer, "list", "JOBQUEUE");
+    local serialized = rednet.receive("JOBQUEUE");
+    local allJobs = textutils.unserialize(serialized);
+    local filteredJobs = {};
+    for _, jobCommand in pairs(allJobs) do
+        local s, e, job, textX, textZ = string.find(jobCommand, "([^ ]+) (-?%d+) (-?%d+)")
+        if x == tonumber(textX) and z == tonumber(textZ) then
+            table.insert(filteredJobs, jobCommand);
+        end
+    end
+    return filteredJobs;
+end
+
 
 local function GetChunkData(x, z)
     local name = ToChunkName(x, z);
@@ -104,10 +119,12 @@ local function DrawSingleChunk(monitor, x, z)
     monitor.write(string.format("%2i", status));
 end
 
-local function DrawCenterPosition(monitor)
+local function DrawFooterInfo(monitor)
     monitor.setCursorPos(1, chunkHeight + 1);
     monitor.setBackgroundColor(colors.magenta);
     monitor.write(tostring(centerChunk.x) .. "," .. tostring    (centerChunk.z));
+    local jobs = GetJobsAtChunk(centerChunk.x, centerChunk.y);
+    monitor.write(" " .. table.maxn(jobs) .. "jobs");
 end
 
 local function DrawChunkStates(monitor)
@@ -116,7 +133,7 @@ local function DrawChunkStates(monitor)
             DrawSingleChunk(monitor, x, z);
         end
     end
-    DrawCenterPosition(monitor);
+    DrawFooterInfo(monitor);
     FocusCenterScreenPos(monitor);
 end
 

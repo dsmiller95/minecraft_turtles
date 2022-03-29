@@ -153,19 +153,23 @@ local function ProcessCancellation(cancelMessage)
 end
 
 local function QueueNetworkJobs(senderId, message)
-    local result = false;
     if string.find(message, "queue ") == 1 then
-        result = ProcessQueue(message);
+        local result = ProcessQueue(message);
+        rednet.send(senderId, result, "JOBQUEUE");
     elseif string.find(message, "cancel ") == 1 then
-        result = ProcessCancellation(message);
+        local result = ProcessCancellation(message);
+        rednet.send(senderId, result, "JOBQUEUE");
+    elseif string.find(message, "list") == 1 then
+        local jobCommands = {};
+        for _, job in pairs(allJobs) do
+            table.insert(jobCommands, job.command);
+        end
+        local serialized =  textutils.serialize(jobCommands);
+        rednet.send(senderId, serialized, "JOBQUEUE");
     else
-        print("usage: 'ls', 'queue', or 'cancel'");
+        
+        rednet.send(senderId, "INVALID REQUEST", "JOBQUEUE");
     end
-    local msg = "REJECTED";
-    if result then
-        msg = "ACCEPTED";
-    end
-    rednet.send(senderId, msg, "JOBQUEUE");
 end
 
 local function QueueJobs()
