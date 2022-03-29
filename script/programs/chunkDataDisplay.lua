@@ -69,12 +69,13 @@ end
 
 local function FocusCenterScreenPos(monitor)
     local centerX, centerZ = CenterOfScreen()
-    monitor.setCursorPos(centerX, centerZ);
+    monitor.setCursorPos(centerX * 2, centerZ);
     monitor.setCursorBlink(true);
 end
 
 local function InitializeChunkTable(monitor)
     chunkWidth, chunkHeight = monitor.getSize();
+    chunkWidth = math.floor(chunkWidth / 2);
     chunkHeight = chunkHeight - 1;
     chunkTable = {};
     for z = 1, chunkHeight do
@@ -90,7 +91,7 @@ local function InitializeChunkTable(monitor)
 end
 
 local function DrawSingleChunk(monitor, x, z)
-    monitor.setCursorPos(x, z);
+    monitor.setCursorPos(((x - 1) * 2) + 1, z);
     local chunk = GetChunkData(ScreenPosToChunk(x, z));
     local status;
     if not chunk then
@@ -100,7 +101,7 @@ local function DrawSingleChunk(monitor, x, z)
     end
     local color = colorsByChunkStats[status] or unknownChunkStatus;
     monitor.setBackgroundColor(color);
-    monitor.write(tostring(status));
+    monitor.write(string.format("%02i", status));
 end
 
 local function DrawCenterPosition(monitor)
