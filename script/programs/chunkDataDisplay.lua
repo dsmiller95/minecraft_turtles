@@ -37,7 +37,10 @@ local function ToChunkName(x, z)
 end
 
 local function GetJobsAtChunk(x, z)
-    local jobServer = rednet.lookup("JOBQUEUE", "job queueing server");
+    local jobServer = rednet.lookup("JOBQUEUE");
+    if not jobServer then
+        return {};
+    end
     rednet.send(jobServer, "list", "JOBQUEUE");
     local jobServer, serialized = rednet.receive("JOBQUEUE");
     local allJobs = textutils.unserialize(serialized);
@@ -264,6 +267,9 @@ local function WatchForGpsChanges(redirect)
     end
 end
 
+
+local modemName = peripheral.getName(peripheral.find("modem"));
+rednet.open(modemName);
 
 local monitor = peripheral.find("monitor");
 local redirect = term.current();
