@@ -81,7 +81,7 @@ function ChunkCache:UpdateChunksAndAdjacentChunks(onChunkChanged)
             if self:ShouldUpdateChunk(chunkX, chunkZ) then
                 local result = mesh.GetChunkStatusFromServer(chunkX, chunkZ);
                 local currentChunk = self:GetChunkData(chunkX, chunkZ);
-                if currentChunk.status ~= result then
+                if not currentChunk or currentChunk.status ~= result then
                     local newChunk = {
                         x = chunkX,
                         z = chunkZ,
