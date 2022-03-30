@@ -4,10 +4,15 @@ local jobInterface = require("lib.jobInterface");
 
 local consts = require("lib.turtleMeshConstants");
 
-local minX = arg[1];
-local minZ = arg[2];
-local maxX = arg[3];
-local maxZ = arg[4];
+local x1 = tonumber(arg[1]);
+local z1 = tonumber(arg[2]);
+local x2 = tonumber(arg[3]);
+local z2 = tonumber(arg[4]);
+
+local minX = math.min(x1, x2);
+local minZ = math.min(z1, z2);
+local maxX = math.max(x1, x2);
+local maxZ = math.max(z1, z2);
 
 local chunkCache = ChunkCache:new(maxX - minX, maxZ - minZ, minX, minZ);
 chunkCache:ReInitializeCache();
