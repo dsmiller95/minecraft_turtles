@@ -25,8 +25,7 @@ local function QueueRemoteJob(command)
     end
     local msg = "queue {" .. command .. "}";
     rednet.send(jobServer, msg, "JOBQUEUE");
-    local jobServer, serialized = rednet.receive("JOBQUEUE");
-    local response = textutils.unserialize(serialized);
+    local jobServer, response = rednet.receive("JOBQUEUE");
     return response;
 end
 
