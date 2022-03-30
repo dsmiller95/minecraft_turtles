@@ -88,12 +88,14 @@ function ChunkCache:UpdateChunksAndAdjacentChunks(onChunkChanged)
                         status = result
                     };
                     self:WriteChunkData(newChunk);
-                    onChunkChanged(x, z);
+                    if onChunkChanged then onChunkChanged(x, z); end
                 end
             end
         end
     end
 end
+
+
 
 
 return {ChunkCache=ChunkCache}
