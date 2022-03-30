@@ -13,14 +13,16 @@ local chunkCache = ChunkCache:new(maxX - minX, maxZ - minZ, minX, minZ);
 chunkCache:ReInitializeCache();
 
 local function TryQueueJobAtChunk(chunkData, jobsByChunk)
-    if chunkData.status > consts.CHUNK_STATUS.MESH_QUARRIED and chunkData.status < consts.CHUNK_STATUS.COMPLETELY_MINED then
+    local minedLevel = tonumber(chunkData.status) - 3;
+    if minedLevel < 0 or minedLevel >= consts.CHUNK_STATUS.COMPLETELY_MINED then
         return false;
     end
     local key = tostring(chunkData.x) .. "," .. tostring(chunkData.z);
     if jobsByChunk[key] and table.maxn(jobsByChunk[key]) > 0 then
         return false;
     end
-    local newJobToQueue = "quarryChunkLevel " .. tostring(chunkData.x) .. " " .. tostring(chunkData.z);
+
+    local newJobToQueue = "quarryChunkLevel " .. tostring(chunkData.x) .. " " .. tostring(chunkData.z) .. " " .. tostring(minedLevel + 1);
     print("queueing new job: " .. newJobToQueue);
     jobInterface.QueueRemoteJob(newJobToQueue);
     return true;
@@ -43,5 +45,5 @@ local function CheckForAndQueueJobs()
     end
 end
 
-
+rednetHelpers.EnsureModemOpen();
 parallel.waitForAny(CheckForAndQueueJobs);
