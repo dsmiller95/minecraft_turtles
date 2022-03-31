@@ -15,7 +15,7 @@ local directionToDiff = {
     vector.new( 0, 0,-1),
 }
 
-local useSafeMode = true;
+local useSafeMode = false;
 
 local function ValidatePredictedPosition()
     if not useSafeMode then
