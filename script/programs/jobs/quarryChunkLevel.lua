@@ -101,7 +101,7 @@ local function Execute(chunkX, chunkZ, layerId)
     targetLevel = tonumber(layerId);
     if targetLevel < 0 then
         error("target level below 0")
-    elseif GetTargetY() <= constants.MESH_LAYER_MAX then
+    elseif GetTargetY() < constants.MESH_LAYER_MAX then
         error("too high of a target level")
     end
     -- coroutine: generate all commands with yields
