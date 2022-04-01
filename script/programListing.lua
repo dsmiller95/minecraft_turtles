@@ -12,5 +12,5 @@ return {
         "chunkDataDisplay", "lib/redstoneTools", "lib/chunkDataCache", 
         "lib/jobInterface", "quarryDispatchServer"
     },
-    version = "0.0.194"
+    version = "0.0.195"
 };

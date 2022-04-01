@@ -19,6 +19,6 @@ return {
         WILDERNESS = 0,
         FUELED = 1,
         MESH_QUARRIED=2,
-        COMPLETELY_MINED = 24
+        COMPLETELY_MINED = 25
     }
 }

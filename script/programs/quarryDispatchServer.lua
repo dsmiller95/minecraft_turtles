@@ -19,7 +19,7 @@ chunkCache:ReInitializeCache();
 
 local function TryQueueJobAtChunk(chunkData, jobsByChunk)
     local minedLevel = tonumber(chunkData.status) - 3;
-    if minedLevel < 0 or minedLevel >= consts.CHUNK_STATUS.COMPLETELY_MINED then
+    if minedLevel < 0 or chunkData.status >= consts.CHUNK_STATUS.COMPLETELY_MINED then
         return false;
     end
     local key = tostring(chunkData.x) .. "," .. tostring(chunkData.z);
