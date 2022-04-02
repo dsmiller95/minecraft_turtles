@@ -69,9 +69,10 @@ local function SelectSlotForItemHandle(handle)
     handle:Select();
 end
 
-local function SelectSlotWithItemsSafe(slotNumber)
+local function SelectSlotWithItemsSafe(slotNumber, minCount)
+    minCount = minCount or 1;
     turtle.select(slotNumber);
-    if turtle.getItemCount(slotNumber) <= 1 then
+    if turtle.getItemCount(slotNumber) <= minCount then
         for i = 1, 16 do
             if i ~= slotNumber and turtle.compareTo(i) then
                 turtle.select(i);
@@ -80,7 +81,7 @@ local function SelectSlotWithItemsSafe(slotNumber)
                 break;
             end
         end
-        if turtle.getItemCount(slotNumber) <= 1 then
+        if turtle.getItemCount(slotNumber) <= minCount then
             error("ran out of items in slot " .. slotNumber)
         end
     end

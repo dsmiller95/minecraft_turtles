@@ -14,6 +14,7 @@ function Fill()
     else
         repeat
             os.sleep(0.5);
+            inventoryTools.SelectSlotWithItemsSafe(buildSlot);
         until (not turtle.placeDown())
     end
 end
