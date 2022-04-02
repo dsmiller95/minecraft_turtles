@@ -79,6 +79,9 @@ local function WrapUp()
 end
 
 local function ExcavateChunkAreaCommands(initial)
+    local target = GetTargetInChunk();
+    position.NavigateToPositionAsCommand(initial, target);
+    initial = target;
     initial = ExcavateLayer(initial);
     WrapUp();
     return initial;
