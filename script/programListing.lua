@@ -1,7 +1,7 @@
 
 return {
     allPrograms = {
-        "spiralTurtle", "straightTurtle", "mineToFloor", "patternPrint",
+        "spiralTurtle", "straightTurtle", "mineToFloor", "patternPrint", "bridgeSegment",
         "manageGlobalInventory", "chunkStatusServer", "itemGridServer", "itemGridReadSurfaceTurtle",
         "RPCClient", "RPCServer",
         "jobClient", "jobServer", "runJob", "lib/jobClientLibrary",
@@ -10,7 +10,8 @@ return {
         "lib/rednetHelpers", "lib/generatorTools",
         "jobs/deployServiceGrid", "jobs/dummyJob", "jobs/quarryServiceGridLayers", "jobs/moveToJob", "jobs/quarryChunkLevel",
         "chunkDataDisplay", "lib/redstoneTools", "lib/chunkDataCache", 
-        "lib/jobInterface", "quarryDispatchServer"
+        "lib/jobInterface", "quarryDispatchServer",
+
     },
-    version = "0.0.196"
+    version = "0.0.197"
 };
