@@ -1,7 +1,7 @@
 
 return {
     allPrograms = {
-        "spiralTurtle", "straightTurtle", "mineToFloor", "patternPrint", "bridgeSegement",
+        "spiralTurtle", "straightTurtle", "mineToFloor", "patternPrint", "bridgeSegement", "fillLake",
         "manageGlobalInventory", "chunkStatusServer", "itemGridServer", "itemGridReadSurfaceTurtle",
         "RPCClient", "RPCServer",
         "jobClient", "jobServer", "runJob", "lib/jobClientLibrary",
@@ -13,5 +13,5 @@ return {
         "lib/jobInterface", "quarryDispatchServer",
 
     },
-    version = "0.0.198"
+    version = "0.0.199"
 };
